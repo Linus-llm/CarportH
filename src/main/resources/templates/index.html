@@ -15,29 +15,60 @@
             <p>Med et specialudviklet computerprogram kan vi lynhurtigt beregne prisen og udskrive en skitsetegning på en carport indenfor vores standardprogram.  Tilbud og skitsetegning fremsendes med post hurtigst muligt. Ved bestilling medfølger standardbyggevejledning.
                 Udfyld formularen omhyggeligt og klik på "Bestil tilbud". Felter markeret med * SKAL udfyldes!</p>
         </div>
-    </div>
-    <div>
-        <h2>Carport med fladt tag</h2>
-        <p>Udfyld nedenstående omhyggeligt og tryk "Bestil tilbud".Så vender vi hurtigst muligt tilbage med et tilbud til dig.</p>
-        <div class="form-group">
-            <label for="carportWidth">Carport bredde *</label>
-            <select id="carportWidth" name="carportWidth">
-                <option value="" disabled selected>Vælg bredde</option>
-                <option value="240">240 cm</option>
-                <option value="270">270 cm</option>
-                <option value="300">300 cm</option>
-            </select>
+        <div class="flexbox-item-formular-box">
+            <div>
+                <h2>Carport med fladt tag</h2>
+                <p>Udfyld nedenstående omhyggeligt og tryk "Bestil tilbud".Så vender vi hurtigst muligt tilbage med et tilbud til dig.</p>
+                <form action="/..." method="post">
+                    <div class="form-group">
+                        <label for="carportWidth">Carport bredde *</label>
+                        <select id="carportWidth" name="carportWidth">
+                            <option value="" disabled selected>Vælg bredde</option>
+                            <option value="240">240 cm</option>
+                            <option value="270">270 cm</option>
+                            <option value="300">300 cm</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="carportLength">Carport længde *</label>
+                        <select id="carportLength" name="carportLength">
+                            <option value="" disabled selected>Vælg længde</option>
+                            <option value="210">210 cm</option>
+                            <option value="220">220 cm</option>
+                            <option value="230">230 cm</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="carportRoof">Carport trapeztag *</label>
+                        <select id="carportRoof" name="carportRoof">
+                            <option value="" disabled selected>Tag</option>
+                            <option value="0">Uden tagplader</option>
+                            <option value="1">Plasttrapezplader</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="carportShedWidth">Carport skur bredde *</label>
+                        <select id="carportShedWidth" name="carportShedWidth">
+                            <option value="" disabled selected>Vælg bredde</option>
+                            <option value="0">intet skur</option>
+                            <option value="270">270 cm</option>
+                            <option value="300">300 cm</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="carportShedLength">Carport skur længde *</label>
+                        <select id="carportShedLength" name="carportShedLength">
+                            <option value="" disabled selected>Vælg højde</option>
+                            <option value="0">intet skur</option>
+                            <option value="210">210 cm</option>
+                            <option value="220">220 cm</option>
+                            <option value="230">230 cm</option>
+                        </select>
+                    </div>
+                    <button type="submit">Bestil tilbud</button>
+                </form>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="carportHeight">Carport højde *</label>
-            <select id="carportHeight" name="carportHeight">
-                <option value="" disabled selected>Vælg højde</option>
-                <option value="210">210 cm</option>
-                <option value="220">220 cm</option>
-                <option value="230">230 cm</option>
-            </select>
-        </div>
     </div>
-
 </body>
 </html>

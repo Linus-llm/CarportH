@@ -4,7 +4,7 @@
     width: 100vw;
     height:100vh;
     justify-content: flex-start;
-    align-content: center;
+    align-items: center;
     background-color: #F5F5F5;
 }
 .flexbox-item-upperbanner{
@@ -86,6 +86,16 @@
     padding-left: 10%;
     padding-right: 30%;
     width: 60%;
-    height: 35%;
+    height: 20%;
     background-color: orange;
+}
+.flexbox-item-formular-box{
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+    height: 55%;
+    background-color: white;
+}
+.form-group{
+    padding-bottom: 50px;
 }
