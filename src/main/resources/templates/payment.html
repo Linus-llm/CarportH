@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="../public/css/stylesheet.css" th:href="@{/css/stylesheet.css}" rel="stylesheet">
+</head>
+<body>
+    background-color: background-grey;
+    <div class="flexbox-container">
+        <div class="flexbox-item-upperbanner">
+            <th:block th:insert="~{/fragments.html :: header}"></th:block>
+        </div>
+        <h2>Gå til betaling</h2>
+        <div class="spacing">
+        <p>Når du er klar til at afslutte processen, klikker du blot på knappen nedenfor. Det bekræfter dine oplysninger og fuldfører handlingen.</p>
+
+        <button class="standard-blue-button">Betal carport</button>
+        </div>
+    </div>
+
+</body>
+</html>
