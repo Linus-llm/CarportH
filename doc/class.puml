@@ -1,0 +1,202 @@
+@startuml
+package app {
+package db {
+    class ConnectionPool {
+        + ConnectionPool(String user, String password, String url, String db)
+        + getConnection(): Connection
+    }
+
+    enum UserRole {
+        CUSTOMER
+        SALESPERSON
+    }
+    User --* UserRole
+    class User {
+        + id: int
+        + name: String
+        + email: String
+        + role: UserRole
+    }
+
+    UserMapper --* User
+    class UserMapper {
+        + login(ConnectionPool, String email, String password): User
+        + signup(ConnectionPool, String email, String password): boolean
+        + getUser(ConnectionPool, id): User
+    }
+
+    enum OfferStatus {
+
+
+        // A customer has generated an offer
+        // now a salesperson needs to review it
+        SALESPERSON
+
+        // A salesperson has made an offer
+        // now customer needs to accept/reject
+        CUSTOMER
+
+        // The customer has accepted the offer
+        // by paying. Now they can get a PDF
+        ORDERED
+
+
+        // NOTE:
+        // A salesperson can skip SALESPERSON state
+        // by entering a customerId and manually
+        // creating an offer.
+        // Extra communication is over email
+    }
+
+    Offer --* OfferStatus
+    class Offer {
+            + id: int
+            + customerId: int
+            + salespersonId: int
+
+            + address: String
+            + postalcode: int
+            + city: String
+
+            + width: int
+            + height: int
+            + length: int
+            + shedWidth: int
+            + shedHeight: int
+
+            + text: String
+            + status: OfferStatus
+        }
+
+        OfferMapper --* Offer
+        OfferMapper --* ConnectionPool
+        class OfferMapper {
+                + getCustomerOffers(ConnectionPool, customerId): List<Offer>
+                + getSalespersonOffers(ConnectionPool, salespersonId): List<Offer>
+        }
+
+        enum WoodCategory {
+            RAFTER
+            PILLAR
+            BOARD
+        }
+
+        Wood --* WoodCategory
+        class Wood {
+            + profileId: int
+            + category: WoodCategory
+            + width: int
+            + height: int
+            + length: int
+        }
+
+        WoodMapper --* Wood
+        WoodMapper --* ConnectionPool
+        class WoodMapper {
+            + getWood(ConnectionPool, WoodCategory, wishLength): Wood
+        }
+
+    class DBException {}
+
+ }
+package web {
+    Server --* ConnectionPool
+    class Server {
+        static ConnectionPool cp
+        + static main(String[]): void
+    }
+    Server --* UserController
+    Server --* CustomerController
+    Server --* SalespersonController
+    class UserController {
+        + addRoutes(): void
+
+        + serveLoginPage()
+
+        + handleLoginPost()
+        + handleSignupPost()
+    }
+
+    class CustomerController {
+        + addRoutes(): void
+
+        + serveFormPage()
+        + serveOfferPage()
+
+        + handleFormPost()
+        + handleAcceptOfferPost()
+        + handleRejectOfferPost()
+    }
+
+    class SalespersonController {
+        + addRoutes(): void
+
+        + serveOffersPage()
+        + serveNewOfferPage()
+
+        + handleNewOfferPost
+    }
+
+    class Path {
+        // class Web {
+        + INDEX = "/"
+        // }
+        // class Template {
+        + INDEX = "index.html"
+        // }
+    }
+
+    ConnectionPool --* DBException
+    ConnectionPool *-- UserMapper
+
+
+}
+
+    Carport --* ConnectionPool
+    web -* Carport
+    class Carport {
+        // TODO: shed
+        + Carport(ConnectionPool, width, height, length)
+
+        - raftersCount: int
+        - raftersDist: int
+        - raftersProfileId: int
+        - raftersLength: int
+        + calcRafters()
+
+        - strapsProfileId: int
+        - strapsLength: int
+        + calcStraps()
+
+        - pillarsOffs: int[]
+        - pillarsProfileId
+        - pillarsLength
+        + calcPillars()
+
+    }
+
+    draw.Draw ---* Carport
+    package draw {
+        abstract class Draw {
+            + static final VIEW_TOP: int
+            + static final VIEW_SIDE: int
+            # viewWidth
+            # viewHeight
+            + Draw(viewWidth, viewHeight)
+            # abstract drawText(String text, int x, int y): void
+            # abstract drawLine(int x1, int y1, int x2, int y2): void
+            # abstract drawRect(int x, int y, int w, int h): void
+
+            - toview(n, min, max)
+            + render(Carport carport, view): void
+        }
+
+        class DrawSVG extends Draw {
+            - StringBuilder svg
+
+            + svg(): String
+        }
+    }
+
+}
+@enduml
