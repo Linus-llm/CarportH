@@ -3,8 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link href="../public/css/stylesheet.css" th:href="@{/css/stylesheet.css}" rel="stylesheet">
 </head>
 <body>
+    <div class="flexbox-container">
+        <div class="flexbox-item-upperbanner">
+            <th:block th:insert="~{/fragments.html :: header}"></th:block>
+        </div>
+        <div class="flexbox-item-h1-p-box">
+            <h1>Bestil Quick-Byg tilbud - carport med fladt tag</h1>
+            <p>Med et specialudviklet computerprogram kan vi lynhurtigt beregne prisen og udskrive en skitsetegning på en carport indenfor vores standardprogram.  Tilbud og skitsetegning fremsendes med post hurtigst muligt. Ved bestilling medfølger standardbyggevejledning.
+                Udfyld formularen omhyggeligt og klik på "Bestil tilbud". Felter markeret med * SKAL udfyldes!</p>
+        </div>
+    </div>
+    <div>
+        <h2>Carport med fladt tag</h2>
+        <p>Udfyld nedenstående omhyggeligt og tryk "Bestil tilbud".Så vender vi hurtigst muligt tilbage med et tilbud til dig.</p>
+        <div class="form-group">
+            <label for="carportWidth">Carport bredde *</label>
+            <select id="carportWidth" name="carportWidth">
+                <option value="" disabled selected>Vælg bredde</option>
+                <option value="240">240 cm</option>
+                <option value="270">270 cm</option>
+                <option value="300">300 cm</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="carportHeight">Carport højde *</label>
+            <select id="carportHeight" name="carportHeight">
+                <option value="" disabled selected>Vælg højde</option>
+                <option value="210">210 cm</option>
+                <option value="220">220 cm</option>
+                <option value="230">230 cm</option>
+            </select>
+        </div>
+    </div>
 
 </body>
 </html>

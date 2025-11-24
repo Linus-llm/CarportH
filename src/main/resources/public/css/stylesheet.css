@@ -1,0 +1,91 @@
+.flexbox-container{
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height:100vh;
+    justify-content: flex-start;
+    align-content: center;
+    background-color: #F5F5F5;
+}
+.flexbox-item-upperbanner{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height:10%;
+    margin-top: 2%;
+    background-color: white;
+}
+.header-menu{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height:100%;
+    background-color: white;
+}
+.header-menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+}
+.header-menu-item-fog{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    height: 100%;
+    background-color: midnightblue;
+}
+.header-menu-item a,
+.header-menu-item-fog a {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.header-menu-button-tilbud,
+.header-menu-button-login,
+.header-menu-button-forespørgsel {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: none;
+    color: black;
+    font-size: 16px;
+    cursor: pointer;
+}
+.header-menu-button-tilbud:hover,
+.header-menu-button-login:hover,
+.header-menu-button-forespørgsel:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.header-menu-button-FOG:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+
+.header-menu-button-FOG{
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.flexbox-item-h1-p-box{
+    display: flex;
+    flex-direction: column;
+    padding-left: 10%;
+    padding-right: 30%;
+    width: 60%;
+    height: 35%;
+    background-color: orange;
+}
