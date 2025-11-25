@@ -16,6 +16,26 @@
     align-items: center;
     background-color: #F5F5F5;
 }
+.flexbox-container-login{
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height:100vh;
+    justify-content: center;
+    align-items: center;
+    background-color: midnightblue;
+}
+.flexbox-item-login-box{
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+    height: 60%;
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+
+    align-items: center;
+}
 .flexbox-item-upperbanner{
     display: flex;
     flex-direction: row;
@@ -47,6 +67,48 @@
 }
 .header-menu-item a,
 .header-menu-item-fog a {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+.header-menu-item-fog-login{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    height: 10%;
+    width: 5%;
+    background-color: midnightblue;
+}
+.logininfo-input{
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+    height: 40%;
+    align-items: center;
+}
+.logininfo-input form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 15px;
+}
+.logininfo-input button{
+    padding: 10px;
+    background-color: midnightblue;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.login-button:hover{
+    background-color: rgba(0, 0, 100, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+.header-menu-item-fog-login a {
     width: 100%;
     height: 100%;
     display: flex;
