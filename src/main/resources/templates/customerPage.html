@@ -9,6 +9,49 @@
 <div class="flexbox-item-upperbanner">
   <th:block th:insert="~{/fragments.html :: header}"></th:block>
 </div>
+<h2>Se dine tilbud</h2>
+<p>Her kan du se de tilbud, du har modtaget. <br>
+    Gennemgå oplysningerne og vælg, om du vil acceptere, oprette et modtilbud eller sende en kommentar.</p>
+
+<section class="offer-box" th:each="offer : ${offers}">
+    <p>Tilbud</p>
+
+    <p>
+    <strong>Forespørgsel:</strong>
+    <span th:text="${offer.offerRequest}"></span>
+    </p>
+
+    <p>
+    <strong>Tilbud fra sælger</strong>
+    <span th:text="${offer.price}"></span>
+    </p>
+
+    <form>
+    <button type="submit" class="standard-blue-button">
+        Accepter tilbud
+    </button>
+    </form>
+
+    <form>
+        <button type="submit" class="standard-blue-button">
+            Afvis tilbud
+        </button>
+    </form>
+
+    <form>
+        <label>
+            Kommentar til tilbud
+        </label>
+        <textarea th:id="'comment-' + ${offer.id}" name="comment"
+                  placeholder="Evt. vedhæft kommentar til dit modtilbud her" rows="3">
+        </textarea>
+
+        <button type="submit" class="standard-blue-button">
+            Send melding
+        </button>
+    </form>
+
+</section>
 
 </body>
 </html>
