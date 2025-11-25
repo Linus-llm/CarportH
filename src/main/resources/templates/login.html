@@ -17,15 +17,19 @@
         <p>Log på med din mailadresse</p>
         <div class="logininfo-input">
 
-            <form action="/login" method="post">
+            <form method="post">
 
                 <label for="email">Mailadresse:</label>
                 <input type="text" id="email" name="email">
 
+                <label for="name">navn:</label>
+                <input type="text" id="name" name="name" placeholder="Indtast kun hvis du vil registrere">
+
                 <label for="password">Adgangskode:</label>
                 <input type="password" id="password" name="password">
 
-                <button type="submit" class="login-button">Log på</button>
+                <button type="submit" formaction="/login" class="login-button">Log på</button>
+                <button type="submit" formaction="/register" class="register-button">Registrer</button>
 
             </form>
 
