@@ -15,6 +15,7 @@ public class UserController {
         app.get(Path.Web.INDEX, UserController::serveIndexPage);
         app.get(Path.Web.LOGIN, UserController::serveLoginPage);
         app.post(Path.Web.LOGIN, UserController::handleLoginPost);
+        app.post(Path.Web.REGISTER, UserController::handleRegisterPost);
     }
     public static void serveLoginPage(Context ctx)
     {
@@ -56,6 +57,24 @@ public class UserController {
         if (redirect != null) {
             ctx.sessionAttribute("loginredirect", null);
             ctx.redirect(redirect);
+            return;
+        }
+        ctx.redirect(Path.Web.INDEX);
+    }
+
+    public static void handleRegisterPost(Context ctx)
+    {
+        String name = ctx.formParam("name");
+        String email = ctx.formParam("email");
+        String password = ctx.formParam("password");
+        if (name == null || email == null || password == null) {
+            ctx.status(HttpStatus.BAD_REQUEST);
+            return;
+        }
+        if (name.isEmpty() || email.isEmpty() || password.isEmpty() ||
+                !UserMapper.register(name, email, password)) {
+            ctx.sessionAttribute("errmsg", "* Failed to register");
+            ctx.redirect(Path.Web.LOGIN);
             return;
         }
         ctx.redirect(Path.Web.INDEX);

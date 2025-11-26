@@ -2,14 +2,26 @@ package app.db;
 import app.web.Server;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.security.SecureRandom;
+import java.util.List;
 
 
 public class UserMapper {
+
+    private static byte[] genSalt()
+    {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        return salt;
+    }
 
     private static byte[] hashPassword(String password, byte[] salt)
             throws Exception
@@ -25,7 +37,7 @@ public class UserMapper {
 
         PreparedStatement ps;
         ResultSet rs;
-        String sql = "SELECT users.id, users.name, users.email, users.password, users.role FROM users WHERE users.email=?";
+        String sql = "SELECT users.id, users.name, users.email, users.password, users.salt, users.role FROM users WHERE users.email=?";
 
         try (Connection conn = Server.connectionPool.getConnection()){
             ps = conn.prepareStatement(sql);
@@ -52,4 +64,34 @@ public class UserMapper {
 
         return user;
     }
+
+    public static boolean register(String name, String email, String password)
+    {
+        PreparedStatement ps;
+        ResultSet rs;
+        String sqlQuery = "SELECT users.id FROM users WHERE users.email=?";
+        String sqlUpdate = "INSERT INTO users (name, email, password, salt, role) VALUES(?, ?, ?, ?, ?)";
+
+        try (Connection conn = Server.connectionPool.getConnection()){
+            ps = conn.prepareStatement(sqlQuery);
+            ps.setString(1, email);
+            rs = ps.executeQuery();
+            if (!rs.next()) {
+                byte[] salt = genSalt();
+                byte[] hash = hashPassword(password, salt);
+                ps = conn.prepareStatement(sqlUpdate);
+                ps.setString(1, name);
+                ps.setString(2, email);
+                ps.setBytes(3, hash);
+                ps.setBytes(4, salt);
+                ps.setInt(5, 0);
+                return (ps.executeUpdate() > 0);
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+
+        return false;
+    }
+
 }

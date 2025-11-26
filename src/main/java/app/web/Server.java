@@ -1,5 +1,6 @@
 package app.web;
 
+import app.db.UserMapper;
 import io.javalin.Javalin;
 
 import java.sql.SQLException;
@@ -47,5 +48,6 @@ public class Server {
         SalesController.addRoutes(app);
 
         app.start(7070);
+        //test
     }
 }

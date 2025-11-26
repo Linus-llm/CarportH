@@ -9,6 +9,7 @@ public class Path {
         public static final String SALES_NEW_OFFER = "/sales/new-offer/{id}";
         public static final String SALES_SEND_OFFER = "/sales/send-offer";
         public static final String SALES_CALC = "/sales/calc";
+        public static final String REGISTER ="/register";
     }
 
     public static class Template {
