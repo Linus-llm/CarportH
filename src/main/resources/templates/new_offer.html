@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Nyt tilbud - '+${offer.id}"></title>
+</head>
+<body>
+    <span>Konstrukstionsstørrelse (mm mål)</span>
+    <br>
+    <span th:text="'Bredde: '+${offer.width}"></span>
+    <br>
+    <span th:text="'Længde: '+${offer.length}"></span>
+    <br>
+    <span th:text="'Højde: '+${offer.height}"></span>
+    <br>
+    <form method="POST" action="/sales/calc">
+        <button type="submit">Beregn stykliste</button>
+    </form>
+    <form method="POST" action="/sales/send-offer">
+        <button type="submit">Send tilbud</button>
+    </form>
+</body>
+</html>

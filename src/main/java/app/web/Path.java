@@ -5,10 +5,16 @@ public class Path {
     public static class Web {
         public static final String INDEX = "/";
         public static final String LOGIN = "/login";
+        public static final String SALES = "/sales";
+        public static final String SALES_NEW_OFFER = "/sales/new-offer/{id}";
+        public static final String SALES_SEND_OFFER = "/sales/send-offer";
+        public static final String SALES_CALC = "/sales/calc";
     }
 
     public static class Template {
         public static final String INDEX = "/index.html";
         public static final String LOGIN = "/login.html";
+        public static final String SALES = "/sales.html";
+        public static final String SALES_NEW_OFFER = "/new_offer.html";
     }
 }
