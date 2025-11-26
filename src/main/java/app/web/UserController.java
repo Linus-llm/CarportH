@@ -18,6 +18,7 @@ public class UserController {
     }
     public static void serveLoginPage(Context ctx)
     {
+        ctx.attribute("user", ctx.sessionAttribute("user"));
         ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
         ctx.render(Path.Template.LOGIN);
         ctx.sessionAttribute("errmsg", null);

@@ -1,5 +1,6 @@
 package app.web;
 
+import app.db.User;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
@@ -14,9 +15,10 @@ public class CustomerController{
         app.post(Path.Web.SEND_REQUEST, CustomerController::handleFormPost);
     }
 
-    public static void serveIndexPage(Context ctx)
-    {
-        ctx.attribute("user", ctx.sessionAttribute("user"));
+    public static void serveIndexPage(Context ctx) {
+        User user = ctx.sessionAttribute("user");
+
+        ctx.attribute("user", user);
         ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
         ctx.render(Path.Template.INDEX);
         ctx.sessionAttribute("errmsg", null);
