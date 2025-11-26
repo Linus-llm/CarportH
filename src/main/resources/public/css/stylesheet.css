@@ -198,3 +198,78 @@ p{
 body {
     background-color: #F5F5F5;
 }
+
+/*styling for customerPage*/
+
+.page-wrapper {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 40px 0;
+}
+
+.intro-text {
+    max-width: 600px;
+    margin-bottom: 32px;
+}
+
+.tilbud-list {
+    background-color: var(--background-grey, #F5F5F5);
+    padding: 32px;
+}
+
+.tilbud-boks {
+    background-color: #FFFFFF;
+    padding: 24px 32px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.label-line {
+    margin: 4px 0;
+}
+
+.button-row {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0;
+}
+
+.standard-blue-button {
+    background-color: var(--signature-blue, #154985);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 3px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font: inherit;
+}
+
+.standard-outline-button {
+    background-color: #FFFFFF;
+    color: var(--signature-blue, #154985);
+    border: 1px solid var(--signature-blue, #154985);
+    border-radius: 3px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font: inherit;
+}
+
+.message-form textarea {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 6px 8px;
+    border: 1px solid #CCCCCC;
+    border-radius: 3px;
+    font: inherit;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}

@@ -1,5 +1,7 @@
 package app.web;
 
+import app.db.Offer;
+import app.db.OfferMapper;
 import app.db.UserMapper;
 import app.db.User;
 import io.javalin.Javalin;
@@ -7,6 +9,7 @@ import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class UserController {
 
@@ -16,6 +19,9 @@ public class UserController {
         app.get(Path.Web.LOGIN, UserController::serveLoginPage);
         app.post(Path.Web.LOGIN, UserController::handleLoginPost);
         app.post(Path.Web.REGISTER, UserController::handleRegisterPost);
+
+        app.get(Path.Web.USER_OFFERS, UserController::serveUserOffersPage);
+
     }
     public static void serveLoginPage(Context ctx)
     {
@@ -79,4 +85,28 @@ public class UserController {
         }
         ctx.redirect(Path.Web.INDEX);
     }
+
+
+    public static void serveUserOffersPage(Context ctx)
+    {
+        try {
+            User user = ctx.sessionAttribute("user");
+            if (user == null) {
+                // Ikke logget ind → send til login og gem redirect
+                ctx.sessionAttribute("loginredirect", Path.Web.USER_OFFERS);
+                ctx.redirect(Path.Web.LOGIN);
+                return;
+            }
+
+            List<Offer> offers = OfferMapper.getCustomerOffers(Server.connectionPool, user.id);
+
+            ctx.attribute("user", user);
+            ctx.attribute("offers", offers);
+            ctx.render(Path.Template.USER_OFFERS);
+        } catch (Exception e) {
+            System.out.println("ERROR: " + e.getMessage());
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
