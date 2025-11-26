@@ -12,7 +12,6 @@ public class UserController {
 
     public static void addRoutes(Javalin app)
     {
-        app.get(Path.Web.INDEX, UserController::serveIndexPage);
         app.get(Path.Web.LOGIN, UserController::serveLoginPage);
         app.post(Path.Web.LOGIN, UserController::handleLoginPost);
         app.post(Path.Web.REGISTER, UserController::handleRegisterPost);
@@ -24,13 +23,7 @@ public class UserController {
         ctx.sessionAttribute("errmsg", null);
     }
 
-    public static void serveIndexPage(Context ctx)
-    {
-        ctx.attribute("user", ctx.sessionAttribute("user"));
-        ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
-        ctx.render(Path.Template.INDEX);
-        ctx.sessionAttribute("errmsg", null);
-    }
+
 
     public static void handleLoginPost(Context ctx)
     {

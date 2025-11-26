@@ -45,9 +45,8 @@ public class Server {
 
         // setup routes
 
-
-
         UserController.addRoutes(app);
+        CustomerController.addRoutes(app);
         app.start(7070);
         //test
     }
