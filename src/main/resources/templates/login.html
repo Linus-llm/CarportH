@@ -3,13 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link href="../public/css/stylesheet.css" th:href="@{/css/style.css}" rel="stylesheet">
+    <link href="../public/css/stylesheet.css" th:href="@{/css/stylesheet.css}" rel="stylesheet">
 </head>
 <body>
-<div class="flexbox-container">
-    <div class="flexbox-item-upperbanner">
-        <th:block th:insert="~{/fragments.html :: header}"></th:block>
+<div class="flexbox-container-login">
+    <div class="flexbox-item-login-box">
+        <div class="header-menu-item-fog-login">
+            <a href=https://www.johannesfog.dk/>
+                <button class="header-menu-button-FOG" type="submit">FOG</button>
+            </a>
+        </div>
+        <h1>Log på</h1>
+        <p>Log på med din mailadresse</p>
+        <div class="logininfo-input">
 
+            <form method="post">
+
+                <label for="email">Mailadresse:</label>
+                <input type="text" id="email" name="email">
+
+                <label for="name">navn:</label>
+                <input type="text" id="name" name="name" placeholder="Indtast kun hvis du vil registrere">
+
+                <label for="password">Adgangskode:</label>
+                <input type="password" id="password" name="password">
+
+                <button type="submit" formaction="/login" class="login-button">Log på</button>
+                <button type="submit" formaction="/register" class="register-button">Registrer</button>
+
+            </form>
+
+        </div>
     </div>
 </div>
 
