@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sales</title>
+</head>
+<body>
+
+    <th:block th:each="offer:${offers}">
+        <a th:if="${offer.status == (@app.db.OfferStatus@SALESPERSON)}" th:href="@{/sales/new-offer/{id} (id=${offer.id})}">
+            <button type="button" th:text="${offer.id}"></button>
+        </a>
+        <span th:if="${offer.status==(@app.db.OfferStatus@CUSTOMER)}" th:text="${offer.id}"></span>
+        <br>
+    </th:block>
+</body>
+</html>

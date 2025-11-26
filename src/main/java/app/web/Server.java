@@ -19,7 +19,6 @@ public class Server {
     private static final String JDBC_DB = System.getenv("JDBC_DB");
     static ConnectionPool connectionPool;
 
-
     public static void main(String[] args)
     {
         Javalin app;
@@ -47,6 +46,8 @@ public class Server {
 
         UserController.addRoutes(app);
         CustomerController.addRoutes(app);
+        SalesController.addRoutes(app);
+
         app.start(7070);
         //test
     }
