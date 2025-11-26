@@ -49,5 +49,6 @@ public class Server {
 
         UserController.addRoutes(app);
         app.start(7070);
+        //test
     }
 }
