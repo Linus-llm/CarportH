@@ -1,5 +1,6 @@
 package app.web;
 
+import app.db.ConnectionPool;
 import app.db.UserMapper;
 import app.db.User;
 import io.javalin.Javalin;
@@ -9,6 +10,8 @@ import io.javalin.http.HttpStatus;
 import java.util.ArrayList;
 
 public class UserController {
+
+    static ConnectionPool cp = Server.connectionPool;
 
     public static void addRoutes(Javalin app)
     {
@@ -41,7 +44,7 @@ public class UserController {
             ctx.redirect(Path.Web.LOGIN);
             return;
         }
-        user = UserMapper.login(email, password);
+        user = UserMapper.login(cp, email, password);
         if (user == null) {
             ctx.sessionAttribute("errmsg", "* Invalid email or password");
             ctx.redirect(Path.Web.LOGIN);
@@ -66,7 +69,7 @@ public class UserController {
             return;
         }
         if (name.isEmpty() || email.isEmpty() || password.isEmpty() ||
-                !UserMapper.register(name, email, password)) {
+                !UserMapper.register(cp, name, email, password)) {
             ctx.sessionAttribute("errmsg", "* Failed to register");
             ctx.redirect(Path.Web.LOGIN);
             return;

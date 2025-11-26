@@ -17,7 +17,7 @@ public class Server {
     private static final String JDBC_PASSWORD = System.getenv("JDBC_PASSWORD");
     private static final String JDBC_URL = System.getenv("JDBC_URL");
     private static final String JDBC_DB = System.getenv("JDBC_DB");
-    public static ConnectionPool connectionPool;
+    static ConnectionPool connectionPool;
 
 
     public static void main(String[] args)
