@@ -11,7 +11,7 @@ public class CustomerController{
     public static void addRoutes(Javalin app)
     {
         app.get(Path.Web.INDEX, CustomerController::serveIndexPage);
-
+        app.post(Path.Web.SEND_REQUEST, CustomerController::handleFormPost);
     }
 
     public static void serveIndexPage(Context ctx)
@@ -24,7 +24,7 @@ public class CustomerController{
 
     public static void handleFormPost(Context ctx)
     {
-        // Implementation for handling form submission
+
         int carportWidth = Integer.parseInt(ctx.formParam("carportWidth"));
         int carportLength = Integer.parseInt(ctx.formParam("carportLength"));
         String carportRoof = ctx.formParam("carportRoof");
@@ -40,7 +40,7 @@ public class CustomerController{
         formData.put("carportShedLength", carportShedLength);
 
         ctx.sessionAttribute("formData", formData);
-        ctx.redirect(Path.Web.);
+        ctx.redirect(Path.Web.INDEX);
     }
 
 }
