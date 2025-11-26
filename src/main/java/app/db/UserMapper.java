@@ -7,6 +7,7 @@ import java.security.spec.KeySpec;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.security.SecureRandom;
@@ -92,6 +93,28 @@ public class UserMapper {
         }
 
         return false;
+    }
+
+    public static User getUser(ConnectionPool cp, int id)
+            throws SQLException
+    {
+        PreparedStatement ps;
+        ResultSet rs;
+        String sql = "SELECT users.id, users.name, users.email, users.password, users.salt, users.role FROM users WHERE users.id=?";
+
+        try (Connection conn = cp.getConnection()) {
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return new User(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        UserRole.values()[rs.getInt("role")]);
+            }
+        }
+        return null;
     }
 
 }
