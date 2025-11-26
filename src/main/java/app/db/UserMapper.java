@@ -31,7 +31,7 @@ public class UserMapper {
         return factory.generateSecret(spec).getEncoded();
     }
 
-    public static User login(String email, String password)
+    public static User login(ConnectionPool cp, String email, String password)
     {
         User user = null;
 
@@ -39,7 +39,7 @@ public class UserMapper {
         ResultSet rs;
         String sql = "SELECT users.id, users.name, users.email, users.password, users.salt, users.role FROM users WHERE users.email=?";
 
-        try (Connection conn = Server.connectionPool.getConnection()){
+        try (Connection conn = cp.getConnection()){
             ps = conn.prepareStatement(sql);
             ps.setString(1, email);
             rs = ps.executeQuery();
@@ -65,14 +65,14 @@ public class UserMapper {
         return user;
     }
 
-    public static boolean register(String name, String email, String password)
+    public static boolean register(ConnectionPool cp, String name, String email, String password)
     {
         PreparedStatement ps;
         ResultSet rs;
         String sqlQuery = "SELECT users.id FROM users WHERE users.email=?";
         String sqlUpdate = "INSERT INTO users (name, email, password, salt, role) VALUES(?, ?, ?, ?, ?)";
 
-        try (Connection conn = Server.connectionPool.getConnection()){
+        try (Connection conn = cp.getConnection()){
             ps = conn.prepareStatement(sqlQuery);
             ps.setString(1, email);
             rs = ps.executeQuery();
