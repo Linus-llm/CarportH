@@ -22,7 +22,6 @@ public class UserController {
         app.get(Path.Web.LOGIN, UserController::serveLoginPage);
         app.post(Path.Web.LOGIN, UserController::handleLoginPost);
         app.post(Path.Web.REGISTER, UserController::handleRegisterPost);
-
         app.get(Path.Web.USER_OFFERS, UserController::serveUserOffersPage);
 
     }
@@ -56,7 +55,7 @@ public class UserController {
             ctx.redirect(Path.Web.LOGIN);
             return;
         }
-        user = UserMapper.login(email, password);
+        user = UserMapper.login(cp, email, password);
         if (user == null) {
             ctx.sessionAttribute("errmsg", "* Invalid email or password");
             ctx.redirect(Path.Web.LOGIN);
@@ -81,7 +80,7 @@ public class UserController {
             return;
         }
         if (name.isEmpty() || email.isEmpty() || password.isEmpty() ||
-                !UserMapper.register(name, email, password)) {
+                !UserMapper.register(cp, name, email, password)) {
             ctx.sessionAttribute("errmsg", "* Failed to register");
             ctx.redirect(Path.Web.LOGIN);
             return;
