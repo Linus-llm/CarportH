@@ -67,6 +67,11 @@ public class SalesController {
             // TODO: List<Bill> bills = BillMapper.getBills(Server.connectionPool, offerId);
             // ctx.attribute("bills", bills);
             ctx.attribute("offer", offer);
+            String defaultTab = ctx.sessionAttribute("defaultTab");
+            if (defaultTab == null)
+                defaultTab = "tab-dimensions";
+            ctx.attribute("defaultTab", defaultTab);
+            ctx.sessionAttribute("defaultTab", "tab-dimensions");
             ctx.render(Path.Template.SALES_NEW_OFFER);
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
@@ -75,8 +80,34 @@ public class SalesController {
     }
 
     public static void handleCalcPost(Context ctx) {
+        String path;
+        int idx;
+        Offer offer;
+
+        offer = ctx.sessionAttribute("offer");
+        if (offer == null) {
+            ctx.status(HttpStatus.BAD_REQUEST);
+            return;
+        }
+
+        String w = ctx.formParam("width");
+        String l = ctx.formParam("length");
+        String h = ctx.formParam("height");
+        if (w == null || l == null || h == null) {
+            ctx.status(HttpStatus.BAD_REQUEST);
+            return;
+        }
+        offer.width = Integer.parseInt(w);
+        offer.length = Integer.parseInt(l);
+        offer.height = Integer.parseInt(h);
         // TODO: calculate mat list
-        ctx.redirect(Path.Web.SALES_NEW_OFFER);
+
+        path = Path.Web.SALES_NEW_OFFER;
+        idx = path.indexOf('{');
+        path = path.substring(0, idx);
+        path += offer.id;
+        ctx.sessionAttribute("defaultTab", "tab-matlist");
+        ctx.redirect(path);
     }
 
     public static void handleSendOfferPost(Context ctx) {

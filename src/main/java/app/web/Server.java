@@ -16,8 +16,7 @@ public class Server {
     private static final String JDBC_PASSWORD = System.getenv("JDBC_PASSWORD");
     private static final String JDBC_URL = System.getenv("JDBC_URL");
     private static final String JDBC_DB = System.getenv("JDBC_DB");
-    // FIXME: should not be used directly outside 'web' package
-    public static ConnectionPool connectionPool;
+    static ConnectionPool connectionPool;
 
     public static void main(String[] args)
     {
@@ -43,9 +42,14 @@ public class Server {
         });
 
         // setup routes
+
+
+
         UserController.addRoutes(app);
+        CustomerController.addRoutes(app);
         SalesController.addRoutes(app);
 
         app.start(7070);
+        //test
     }
 }

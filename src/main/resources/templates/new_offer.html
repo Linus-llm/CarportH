@@ -3,21 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="'Nyt tilbud - '+${offer.id}"></title>
+    <style>
+        body {
+            background-color: #efefef;
+        }
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+        }
+
+        .tab-button {
+            color: black;
+            background-color: inherit;
+            float: left;
+            border: none;
+            border-left: 1px solid black;
+            border-right: 1px solid black;
+            outline: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab-button:hover {
+            background-color: #ddd;
+        }
+
+        .tab-button.active {
+            background-color: white;
+        }
+
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+
+        .frame {
+            border: 1px solid #787878;
+            padding: 4px;
+            width: 50%;
+        }
+        .frame-text {
+            width: 50%;
+            color: grey;
+            border: none;
+            border-left: 2px solid black;
+            border-top: 2px solid black;
+            background-color: white;
+        }
+    </style>
 </head>
 <body>
-    <span>Konstrukstionsstørrelse (mm mål)</span>
-    <br>
-    <span th:text="'Bredde: '+${offer.width}"></span>
-    <br>
-    <span th:text="'Længde: '+${offer.length}"></span>
-    <br>
-    <span th:text="'Højde: '+${offer.height}"></span>
-    <br>
-    <form method="POST" action="/sales/calc">
-        <button type="submit">Beregn stykliste</button>
-    </form>
-    <form method="POST" action="/sales/send-offer">
-        <button type="submit">Send tilbud</button>
-    </form>
+    <div class="tab">
+        <a id="tab-dimensions" class="tablink tab-button" onclick="openTab(event, 'dimensions')">Dimensioner</a>
+        <a id="tab-matlist" class="tablink tab-button" onclick="openTab(event, 'matlist')">Stykliste</a>
+        <a class="tablink tab-button" onclick="openTab(event, 'drawing')">Tegning</a>
+        <a class="tablink tab-button" onclick="openTab(event, 'offer')">Tilbud</a>
+    </div>
+
+    <div id="dimensions" class="tabcontent">
+        <span>Konstrukstionsstørrelse (mm mål)</span>
+        <form method="POST" action="/sales/calc">
+            <label for="width">Bredde:</label>
+            <input type="number" id="width" name="width" th:value="${offer.width}">
+            <br>
+            <label for="length">Lœngde:</label>
+            <input type="number" id="length" name="length" th:value="${offer.length}">
+            <br>
+            <label for="height">Højde:</label>
+            <input type="number" id="height" name="height" th:value="${offer.height}">
+            <br>
+            <button type="submit">Beregn stykliste --></button>
+        </form>
+    </div>
+    <div id="matlist" class="tabcontent">
+        <p>Stykliste</p>
+    </div>
+    <div id="drawing" class="tabcontent">
+        <p>Tegning</p>
+    </div>
+    <div id="offer" class="tabcontent">
+        <div class="frame">
+            <p>Konstrukstionsbeskrivelse</p>
+            <div class="frame-text">
+                <span th:text="'Tilbud nr. '+${offer.id}"></span><br>
+                <span>--------------------------</span><br>
+                <span th:text="'Carport'+${offer.width}+' x '+${offer.length}+' mm.'"></span><br>
+                <span>--------------------------</span><br>
+                <span th:text="'Salgspris: '+${offer.price}"></span><br>
+                <span>--------------------------</span><br>
+            </div>
+        </div>
+        <form method="POST" action="/sales/send-offer">
+            <button type="submit">Send tilbud</button>
+        </form>
+    </div>
 </body>
+<script th:inline="javascript">
+    let defaultTab = [[${defaultTab}]];
+    function openTab(event, tabName) {
+        var i, tabcontent, tablink;
+
+        tabcontents = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontents.length; i++)
+            tabcontents[i].style.display = "none";
+
+        tablinks = document.getElementsByClassName("tablink");
+        for (i = 0; i < tablinks.length; i++)
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+
+        var element = document.getElementById(tabName);
+        element.style.display = "block";
+        event.currentTarget.className += " active";
+    }
+    document.getElementById(defaultTab).click();
+</script>
 </html>

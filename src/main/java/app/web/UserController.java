@@ -2,6 +2,7 @@ package app.web;
 
 import app.db.Offer;
 import app.db.OfferMapper;
+import app.db.ConnectionPool;
 import app.db.UserMapper;
 import app.db.User;
 import io.javalin.Javalin;
@@ -12,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserController {
+
+    static ConnectionPool cp = Server.connectionPool;
 
     public static void addRoutes(Javalin app)
     {

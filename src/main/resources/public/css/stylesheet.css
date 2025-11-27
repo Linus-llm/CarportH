@@ -119,7 +119,8 @@
 
 .header-menu-button-tilbud,
 .header-menu-button-login,
-.header-menu-button-forespørgsel {
+.header-menu-button-forespørgsel,
+.header-menu-button-SælgerView{
     width: 100%;
     height: 100%;
     background-color: transparent;
@@ -130,7 +131,8 @@
 }
 .header-menu-button-tilbud:hover,
 .header-menu-button-login:hover,
-.header-menu-button-forespørgsel:hover {
+.header-menu-button-forespørgsel:hover,
+.header-menu-button-SælgerView:hover{
     background-color: rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s ease;
 }
