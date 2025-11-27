@@ -1,11 +1,13 @@
 package app.web;
 
+import app.db.OfferMapper;
+import app.db.Offer;
+import app.db.OfferStatus;
 import app.db.User;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.SQLException;
 
 public class CustomerController{
 
@@ -26,22 +28,29 @@ public class CustomerController{
 
     public static void handleFormPost(Context ctx)
     {
+        //TODO tilføj check af user ikke er null
 
-        int carportWidth = Integer.parseInt(ctx.formParam("carportWidth"));
-        int carportLength = Integer.parseInt(ctx.formParam("carportLength"));
-        String carportRoof = ctx.formParam("carportRoof");
-        int carportShedWidth = Integer.parseInt(ctx.formParam("carportShedWidth"));
-        int carportShedLength = Integer.parseInt(ctx.formParam("carportShedLength"));
+            User user = ctx.sessionAttribute("user");
+            Offer offer = null;
+        if (user!=null) {
+            int carportWidth = Integer.parseInt(ctx.formParam("carportWidth"));
+            int carportLength = Integer.parseInt(ctx.formParam("carportLength"));
+            int carportShedWidth = Integer.parseInt(ctx.formParam("carportShedWidth"));
+            int carportShedLength = Integer.parseInt(ctx.formParam("carportShedLength"));
+            String adress = ctx.formParam("adress");
+            int postalcode = Integer.parseInt(ctx.formParam("postalcode"));
+            String city = ctx.formParam("city");
+            int height = 2215; // default height
+            int customerId = user.id;
 
 
-        Map<String, Object> formData = new HashMap<>();
-        formData.put("carportWidth", carportWidth);
-        formData.put("carportLength", carportLength);
-        formData.put("carportRoof", carportRoof);
-        formData.put("carportShedWidth", carportShedWidth);
-        formData.put("carportShedLength", carportShedLength);
-
-        ctx.sessionAttribute("formData", formData);
+            offer = new Offer(0, customerId, adress, postalcode, city, carportWidth, height, carportLength, carportShedWidth, carportShedLength, OfferStatus.SALESPERSON);
+            try {
+                OfferMapper.addQuery(Server.connectionPool, offer);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
         ctx.redirect(Path.Web.INDEX);
     }
 
