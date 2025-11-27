@@ -98,6 +98,30 @@ public class OfferMapper {
         }
     }
 
+    public static boolean addQuery(ConnectionPool cp, Offer offer)
+            throws SQLException
+    {
+        String sql = "INSERT INTO offers (customer_id, address, postalcode, width, height, length, shed_width, shed_length, status) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = cp.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+            int i = 0;
+            ps.setInt(++i, offer.customerId);
+            ps.setString(++i, offer.address);
+            ps.setInt(++i, offer.postalcode);
+            ps.setInt(++i, offer.width);
+            ps.setInt(++i, offer.height);
+            ps.setInt(++i, offer.length);
+            ps.setInt(++i, offer.shedWidth);
+            ps.setInt(++i, offer.shedLength);
+            ps.setInt(++i, offer.status.ordinal());
+            if (ps.executeUpdate() != 1) return false;
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) offer.id = keys.getInt(1);
+            }
+            return true;
+        }
+    }
+
     public static boolean updateOffer(ConnectionPool cp, Offer offer)
             throws SQLException
     {
