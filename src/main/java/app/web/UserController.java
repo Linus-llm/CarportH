@@ -89,7 +89,7 @@ public class UserController {
         ctx.redirect(Path.Web.INDEX);
     }
 
-
+//test
     public static void serveUserOffersPage(Context ctx)
     {
         try {
