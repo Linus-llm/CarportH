@@ -1,25 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link href="../public/css/stylesheet.css" th:href="@{/css/stylesheet.css}" rel="stylesheet">
+  <link rel="stylesheet" href="/css/stylesheet.css" th:href="@{/css/stylesheet.css}">
 </head>
 <body>
-background-color: background-grey;
-<div class="flexbox-container spacing">
-  <div class="flexbox-item-upperbanner">
-    <th:block th:insert="~{/fragments.html :: header}"></th:block>
-  </div>
-
-  <h2>Se dine tilbud</h2>
-  <p>“På denne side får du et overblik over de tilbud, du har modtaget. <br>
-      Du kan acceptere tilbuddet, sende et modtilbud eller skrive en kommentar, <br>
-      hvis du har yderligere spørgsmål.
-  </p>
-    
+<div class="flexbox-item-upperbanner">
+  <th:block th:insert="~{/fragments.html :: header}"></th:block>
 </div>
 
+<div class="page-wrapper">
+<h2>Se dine tilbud</h2>
+
+<p class="intro-text">Her kan du se de tilbud, du har modtaget. <br>
+    Gennemgå oplysningerne og vælg, om du vil acceptere, oprette et modtilbud eller sende en kommentar.</p>
+
+<div class="tilbud-list">
+<section class="offer-box" th:each="offer : ${offers}">
+    <p class="label-line">
+        Tilbud
+    </p>
+
+    <p class="label-line">
+    <strong>Forespørgsel:</strong>
+    <span th:text="${offer.offerRequest}"></span>
+    </p>
+
+    <p class="label-line">
+    <strong>Tilbud fra sælger</strong>
+    <span th:text="${offer.price}"></span>
+    </p>
+
+    <div class="button-row">
+    <form th:action="@{/offers/{id}/accept(id=${offer.id})}" method="post">
+    <button type="submit" class="standard-blue-button">
+        Accepter tilbud
+    </button>
+    </form>
+
+    <form th:action="@{/offers/{id}/reject(id=${offer.id})}" method="post">
+        <button type="submit" class="standard-blue-button">
+            Afvis tilbud
+        </button>
+    </form>
+    </div>
+
+    <form th:action="@{/offers/{id}/message(id=${offer.id})}" method="post" class="message-form">
+        <label class="visually-hidden"
+               th:for="'comment-' + ${offer.id}">
+            Kommentar til tilbud
+        </label>
+        <textarea
+                th:id="'comment-' + ${offer.id}"
+                name="comment"
+                placeholder="Evt. vedhæft kommentar til dit modtilbud her"
+                rows="3">
+</textarea>
+
+        <button type="submit" class="standard-blue-button disabled-when-empty">
+            Send melding
+        </button>
+    </form>
+
+</section>
+</div>
+</div>
 
 </body>
 </html>
