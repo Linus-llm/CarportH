@@ -129,4 +129,68 @@ public class OfferMapper {
             return ps.executeUpdate() == 1;
         }
     }
+    public static Offer createCustomerRequest(
+            ConnectionPool cp,
+            int width,
+            int length,
+            int roof,
+            int shedWidth,
+            int shedLength
+    ) throws SQLException {
+
+        String sql = "INSERT INTO offers " +
+                "(customer_id, salesperson_id, address, postalcode, city, " +
+                "width, height, length, shed_width, shed_length, price, text, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = cp.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            int i = 0;
+
+            ps.setInt(++i, 0);                    // customer_id (ingen kunde oprettet endnu)
+            ps.setInt(++i, 2);                    // salesperson_id (fx Bob – kan senere autovælges)
+            ps.setString(++i, "");                // address
+            ps.setInt(++i, 0);                    // postalcode
+            ps.setString(++i, "");                // city
+
+            ps.setInt(++i, width);
+            ps.setInt(++i, 0);                    // height = 0 (kunde har ikke indtastet højde)
+            ps.setInt(++i, length);
+            ps.setInt(++i, shedWidth);
+            ps.setInt(++i, shedLength);
+
+            ps.setDouble(++i, 0.0);               // price
+            ps.setString(++i, "");                // text
+
+            ps.setInt(++i, OfferStatus.CUSTOMER.ordinal());
+
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                int id = rs.getInt(1);
+
+                return new Offer(
+                        id,
+                        0,
+                        2,
+                        "",
+                        0,
+                        "",
+                        width,
+                        0,
+                        length,
+                        shedWidth,
+                        shedLength,
+                        0.0,
+                        "",
+                        OfferStatus.CUSTOMER
+                );
+            }
+        }
+
+        return null;
+    }
 }
+
