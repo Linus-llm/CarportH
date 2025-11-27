@@ -3,14 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>Sales</title>
+    <style>
+        .offer {
+            border: 1px solid black;
+            padding: 6px;
+        }
+        label {
+            font-weight: bold;
+            display: inline-block;
+            width: 6em;
+            cursor: text;
+        }
+    </style>
 </head>
 <body>
 
     <th:block th:each="offer:${offers}">
-        <a th:if="${offer.status == (@app.db.OfferStatus@SALESPERSON)}" th:href="@{/sales/new-offer/{id} (id=${offer.id})}">
-            <button type="button" th:text="${offer.id}"></button>
-        </a>
-        <span th:if="${offer.status==(@app.db.OfferStatus@CUSTOMER)}" th:text="${offer.id}"></span>
+        <div class="offer">
+            <label>Tilbud nr</label>
+            <span th:text="${offer.id}"></span>
+            <br>
+            <label>Carport</label>
+            <span th:text="${offer.width}/1000+' x '+${offer.length}/1000+' mtr.'"></span><br>
+            <a th:if="${offer.status == (@app.db.OfferStatus@SALESPERSON)}" th:href="@{/sales/new-offer/{id} (id=${offer.id})}">
+                <button type="button">Lav tilbud</button>
+            </a>
+        </div>
         <br>
     </th:block>
 </body>

@@ -21,7 +21,8 @@
             border-right: 1px solid black;
             outline: none;
             cursor: pointer;
-            transition: 0.3s;
+            padding-left: 1em;
+            padding-right: 1em;
         }
 
         .tab-button:hover {
@@ -43,14 +44,36 @@
             border: 1px solid #787878;
             padding: 4px;
             width: 50%;
+            margin: 4px;
+        }
+        .frame h3 {
+            margin-top: 0;
         }
         .frame-text {
-            width: 50%;
+            display: inline-block;
             color: grey;
             border: none;
             border-left: 2px solid black;
             border-top: 2px solid black;
             background-color: white;
+        }
+        label {
+            font-weight: bold;
+            display: inline-block;
+            width: 6em;
+            cursor: text;
+        }
+        button {
+            cursor: pointer;
+        }
+        table, th, td {
+            border: 2px solid black;
+            padding-left: 1em;
+            padding-right: 1em;
+        }
+        th {
+            color: black;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -58,41 +81,86 @@
     <div class="tab">
         <a id="tab-dimensions" class="tablink tab-button" onclick="openTab(event, 'dimensions')">Dimensioner</a>
         <a id="tab-matlist" class="tablink tab-button" onclick="openTab(event, 'matlist')">Stykliste</a>
+        <a class="tablink tab-button" onclick="openTab(event, 'customer')">Kunde</a>
         <a class="tablink tab-button" onclick="openTab(event, 'drawing')">Tegning</a>
         <a class="tablink tab-button" onclick="openTab(event, 'offer')">Tilbud</a>
     </div>
 
     <div id="dimensions" class="tabcontent">
-        <span>Konstrukstionsstørrelse (mm mål)</span>
         <form method="POST" action="/sales/calc">
-            <label for="width">Bredde:</label>
-            <input type="number" id="width" name="width" th:value="${offer.width}">
-            <br>
-            <label for="length">Lœngde:</label>
-            <input type="number" id="length" name="length" th:value="${offer.length}">
-            <br>
-            <label for="height">Højde:</label>
-            <input type="number" id="height" name="height" th:value="${offer.height}">
-            <br>
+            <div class="frame">
+                <h3>Konstrukstionsstørrelse (mtr mål)</h3>
+                <label for="width">Bredde:</label>
+                <input type="number" id="width" name="width" step="any" th:value="${offer.width}/1000">
+                <br>
+                <label for="length">Lœngde:</label>
+                <input type="number" id="length" name="length" step="any" th:value="${offer.length}/1000">
+                <br>
+                <label for="height">Højde:</label>
+                <input type="number" id="height" name="height" step="any" th:value="${offer.height}/1000">
+                <br>
+            </div>
             <button type="submit">Beregn stykliste --></button>
         </form>
     </div>
     <div id="matlist" class="tabcontent">
-        <p>Stykliste</p>
+        <h2>Stykliste:</h2>
+        <div class="frame-table">
+            <p>TODO: mat list and display price</p>
+            <div class="frame-text">
+                <table>
+                    <tr>
+                        <th>Beskrivelse</th>
+                        <th>Længde</th>
+                        <th>Antal</th>
+                    </tr>
+                    <tr>
+                        <td>45x195 mm. spærtræ</td>
+                        <td>600</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>97x97 mm. Stolpe</td>
+                        <td>300</td>
+                        <td>11</td>
+                    </tr>
+                    <!-- TODO:
+                     <th:block th:each="bill:${bills}">
+                        <tr >
+                            <td th:text="${bill.width}+'x'+${bill.height}+'mm'></td>
+                            <td th:text="${bill.length}"></td>
+                            <td th:text="${bill.number}></td>
+                        <tr>
+                     </th:block>
+                    -->
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="customer" class="tabcontent">
+        <div class="frame">
+            <h3>Kunde</h3>
+            <label>Kunde nr:</label>
+            <span th:text="${customer.id}"></span><br>
+            <label>Navn:</label>
+            <span th:text="${customer.name}"></span><br>
+            <label>Email:</label>
+            <span th:text="${customer.email}"></span><br>
+        </div>
     </div>
     <div id="drawing" class="tabcontent">
         <p>Tegning</p>
     </div>
     <div id="offer" class="tabcontent">
         <div class="frame">
-            <p>Konstrukstionsbeskrivelse</p>
+            <h3>Konstrukstionsbeskrivelse</h3>
             <div class="frame-text">
-                <span th:text="'Tilbud nr. '+${offer.id}"></span><br>
-                <span>--------------------------</span><br>
-                <span th:text="'Carport'+${offer.width}+' x '+${offer.length}+' mm.'"></span><br>
-                <span>--------------------------</span><br>
-                <span th:text="'Salgspris: '+${offer.price}"></span><br>
-                <span>--------------------------</span><br>
+                <span style="display:block;text-align:center;" th:text="'Tilbud nr. '+${offer.id}"></span><br>
+                <span>------------------------------------</span><br>
+                <span th:text="'Carport '+${offer.width}/1000+' x '+${offer.length}/1000+' mtr.'"></span><br>
+                <span>------------------------------------</span><br>
+                <span th:text="'Salgspris: '+${offer.price}+' kr'"></span><br>
+                <span>------------------------------------</span><br>
             </div>
         </div>
         <form method="POST" action="/sales/send-offer">
