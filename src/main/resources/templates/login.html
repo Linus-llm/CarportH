@@ -15,6 +15,9 @@
         </div>
         <h1>Log på</h1>
         <p>Log på med din mailadresse</p>
+
+        <div th:if="${errmsg != null}" class="alert-error" th:text="${errmsg}"></div>
+
         <div class="logininfo-input">
 
             <form method="post">

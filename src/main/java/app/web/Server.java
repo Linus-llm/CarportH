@@ -47,6 +47,6 @@ public class Server {
         SalesController.addRoutes(app);
 
         app.start(7070);
-        //test
+
     }
 }

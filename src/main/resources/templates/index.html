@@ -9,6 +9,9 @@
     <div class="flexbox-container">
         <div class="flexbox-item-upperbanner">
             <th:block th:insert="~{/fragments.html :: header}"></th:block>
+            <div class="header-menu-item" th:if="${user != null}">
+                    <label class="header-menu-button-loggedintext">Logget på</label>
+            </div>
         </div>
         <div class="flexbox-item-h1-p-box">
             <h1>Bestil Quick-Byg tilbud - carport med fladt tag</h1>
@@ -84,6 +87,8 @@
                     <button type="submit">Bestil tilbud</button>
                 </form>
             </div>
+            <div th:if="${errmsg != null}" class="alert-error" th:text="${errmsg}"></div>
+            <div th:if="${successTxt != null}" class="alert-success" th:text="${successTxt}"></div>
         </div>
     </div>
 </body>
