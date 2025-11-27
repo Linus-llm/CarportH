@@ -19,7 +19,6 @@ public class CustomerController{
 
     public static void serveIndexPage(Context ctx) {
         User user = ctx.sessionAttribute("user");
-
         ctx.attribute("user", user);
         ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
         ctx.render(Path.Template.INDEX);
