@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS public.offers
 (
     id serial NOT NULL,
     customer_id integer NOT NULL,
-    salesperson_id integer NOT NULL,
+    salesperson_id integer,
     address character varying NOT NULL,
     postalcode integer NOT NULL,
     width integer NOT NULL,
@@ -55,8 +55,8 @@ CREATE TABLE IF NOT EXISTS public.offers
     length integer NOT NULL,
     shed_width integer NOT NULL,
     shed_length integer NOT NULL,
-    price double precision NOT NULL,
-    text character varying NOT NULL,
+    price double precision,
+    text character varying,
     status integer NOT NULL,
     PRIMARY KEY (id)
 );
