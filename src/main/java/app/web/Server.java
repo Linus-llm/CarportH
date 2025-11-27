@@ -42,9 +42,6 @@ public class Server {
         });
 
         // setup routes
-
-
-
         UserController.addRoutes(app);
         CustomerController.addRoutes(app);
         SalesController.addRoutes(app);

@@ -14,11 +14,8 @@ import java.util.List;
 
 public class UserController {
 
-    static ConnectionPool cp = Server.connectionPool;
-
     public static void addRoutes(Javalin app)
     {
-        app.get(Path.Web.INDEX, UserController::serveIndexPage);
         app.get(Path.Web.LOGIN, UserController::serveLoginPage);
         app.post(Path.Web.LOGIN, UserController::handleLoginPost);
         app.post(Path.Web.REGISTER, UserController::handleRegisterPost);
@@ -29,14 +26,6 @@ public class UserController {
     {
         ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
         ctx.render(Path.Template.LOGIN);
-        ctx.sessionAttribute("errmsg", null);
-    }
-
-    public static void serveIndexPage(Context ctx)
-    {
-        ctx.attribute("user", ctx.sessionAttribute("user"));
-        ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
-        ctx.render(Path.Template.INDEX);
         ctx.sessionAttribute("errmsg", null);
     }
 
@@ -55,7 +44,7 @@ public class UserController {
             ctx.redirect(Path.Web.LOGIN);
             return;
         }
-        user = UserMapper.login(cp, email, password);
+        user = UserMapper.login(Server.connectionPool, email, password);
         if (user == null) {
             ctx.sessionAttribute("errmsg", "* Invalid email or password");
             ctx.redirect(Path.Web.LOGIN);
@@ -80,7 +69,7 @@ public class UserController {
             return;
         }
         if (name.isEmpty() || email.isEmpty() || password.isEmpty() ||
-                !UserMapper.register(cp, name, email, password)) {
+                !UserMapper.register(Server.connectionPool, name, email, password)) {
             ctx.sessionAttribute("errmsg", "* Failed to register");
             ctx.redirect(Path.Web.LOGIN);
             return;
