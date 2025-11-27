@@ -129,6 +129,12 @@
     font-size: 16px;
     cursor: pointer;
 }
+
+.alert-error
+{ color: #b00020; margin: 0.5rem 0; }
+.alert-success
+{ color: green; margin: 0.5rem 0; }
+
 .header-menu-button-tilbud:hover,
 .header-menu-button-login:hover,
 .header-menu-button-forespørgsel:hover,
