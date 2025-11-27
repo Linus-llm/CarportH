@@ -12,11 +12,18 @@ import java.util.List;
 public class SalesController {
 
     public static void addRoutes(Javalin app) {
+
+
         app.before(Path.Web.SALES + "*", SalesController::before);
         app.get(Path.Web.SALES, SalesController::serveMainPage);
         app.get(Path.Web.SALES_NEW_OFFER, SalesController::serveNewOfferPage);
         app.post(Path.Web.SALES_CALC, SalesController::handleCalcPost);
         app.post(Path.Web.SALES_SEND_OFFER, SalesController::handleSendOfferPost);
+
+
+        app.get("/bestil-carport", SalesController::serveCarportForm);
+        app.post("/send-request", SalesController::handleRequestPost);
+
     }
 
     public static void before(Context ctx) {
@@ -64,8 +71,6 @@ public class SalesController {
                 }
                 ctx.sessionAttribute("offer", offer);
             }
-            // TODO: List<Bill> bills = BillMapper.getBills(Server.connectionPool, offerId);
-            // ctx.attribute("bills", bills);
             ctx.attribute("offer", offer);
             String defaultTab = ctx.sessionAttribute("defaultTab");
             if (defaultTab == null)
@@ -100,7 +105,6 @@ public class SalesController {
         offer.width = Integer.parseInt(w);
         offer.length = Integer.parseInt(l);
         offer.height = Integer.parseInt(h);
-        // TODO: calculate mat list
 
         path = Path.Web.SALES_NEW_OFFER;
         idx = path.indexOf('{');
@@ -122,10 +126,45 @@ public class SalesController {
             offer.status = OfferStatus.CUSTOMER;
             OfferMapper.updateOffer(Server.connectionPool, offer);
         } catch (SQLException e) {
-            System.out.println("ERROR: "+e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             return;
         }
         ctx.redirect(Path.Web.SALES);
+    }
+
+
+    //         INDSAT FRA RequestController
+
+
+    public static void serveCarportForm(Context ctx) {
+        ctx.html(
+                "<h1>Bestil Carport</h1>" +
+                        "<form action='/send-request' method='post'>" +
+                        "Bredde: <input type='text' name='carportWidth'><br>" +
+                        "Længde: <input type='text' name='carportLength'><br>" +
+                        "Tag (0=ingen, 1=plast): <input type='text' name='carportRoof'><br>" +
+                        "Skur bredde: <input type='text' name='carportShedWidth'><br>" +
+                        "Skur længde: <input type='text' name='carportShedLength'><br>" +
+                        "<button type='submit'>Send forespørgsel</button>" +
+                        "</form>"
+        );
+    }
+
+    public static void handleRequestPost(Context ctx) {
+        String width = ctx.formParam("carportWidth");
+        String length = ctx.formParam("carportLength");
+        String roof = ctx.formParam("carportRoof");
+        String shedWidth = ctx.formParam("carportShedWidth");
+        String shedLength = ctx.formParam("carportShedLength");
+
+        System.out.println("Ny carport forespørgsel modtaget:");
+        System.out.println("Bredde: " + width);
+        System.out.println("Længde: " + length);
+        System.out.println("Tag: " + roof);
+        System.out.println("Skur bredde: " + shedWidth);
+        System.out.println("Skur længde: " + shedLength);
+
+        ctx.html("<h2>Tak for din forespørgsel!</h2><p>Vi vender tilbage snarest.</p>");
     }
 }
