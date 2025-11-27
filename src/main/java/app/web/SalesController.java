@@ -58,11 +58,11 @@ public class SalesController {
             Offer offer = ctx.sessionAttribute("offer");
             if (offer == null || offer.id != offerId) {
                 offer = OfferMapper.getOffer(Server.connectionPool, offerId);
-                if (offer == null || offer.status != OfferStatus.SALESPERSON) {
-                    ctx.status(404);
-                    return;
-                }
                 ctx.sessionAttribute("offer", offer);
+            }
+            if (offer == null || offer.status != OfferStatus.SALESPERSON) {
+                ctx.status(404);
+                return;
             }
             // TODO: List<Bill> bills = BillMapper.getBills(Server.connectionPool, offerId);
             // ctx.attribute("bills", bills);
@@ -99,9 +99,9 @@ public class SalesController {
             ctx.status(HttpStatus.BAD_REQUEST);
             return;
         }
-        offer.width = Integer.parseInt(w);
-        offer.length = Integer.parseInt(l);
-        offer.height = Integer.parseInt(h);
+        offer.width = (int)(Float.parseFloat(w)*1000);
+        offer.length = (int)(Float.parseFloat(l)*1000);
+        offer.height = (int)(Float.parseFloat(h)*1000);
         // TODO: calculate mat list
 
         path = Path.Web.SALES_NEW_OFFER;
