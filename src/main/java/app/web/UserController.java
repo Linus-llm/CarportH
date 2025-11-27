@@ -92,7 +92,6 @@ public class UserController {
         try {
             User user = ctx.sessionAttribute("user");
             if (user == null) {
-                // Ikke logget ind → send til login og gem redirect
                 ctx.sessionAttribute("loginredirect", Path.Web.USER_OFFERS);
                 ctx.redirect(Path.Web.LOGIN);
                 return;
