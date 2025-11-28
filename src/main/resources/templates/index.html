@@ -4,92 +4,126 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link href="../public/css/stylesheet.css" th:href="@{/css/stylesheet.css}" rel="stylesheet">
+    <style>
+        .form {
+            padding: 20px;
+            margin: 25px auto;
+            box-sizing: border-box;
+            background: white;
+            max-width: 600px;
+        }
+        .form-item {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .form-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .form textarea {
+            resize: none;
+            padding: 0;
+            padding-bottom: 20px;
+        }
+        .field-required {
+            color: red;
+        }
+        .field {
+            color: black;
+            display: block;
+            width: 100%;
+        }
+        .page {
+            padding: 25px;
+            padding-left: 30px;
+            padding-right: 30px;
+            background: #F5F5F3;
+        }
+        .form-button {
+            cursor: pointer;
+            text-align: center;
+            background: #101661;
+            border: 0;
+            border-radius: 4px;
+            color: #FFFFFF;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
-    <div class="flexbox-container">
-        <div class="flexbox-item-upperbanner">
-            <th:block th:insert="~{/fragments.html :: header}"></th:block>
-            <div class="header-menu-item" th:if="${user != null}">
-                    <label class="header-menu-button-loggedintext">Logget på</label>
-            </div>
-        </div>
-        <div class="flexbox-item-h1-p-box">
-            <h1>Bestil Quick-Byg tilbud - carport med fladt tag</h1>
-            <p>Med et specialudviklet computerprogram kan vi lynhurtigt beregne prisen og udskrive en skitsetegning på en carport indenfor vores standardprogram.  Tilbud og skitsetegning fremsendes med post hurtigst muligt. Ved bestilling medfølger standardbyggevejledning.
-                Udfyld formularen omhyggeligt og klik på "Bestil tilbud". Felter markeret med * SKAL udfyldes!</p>
-        </div>
-        <div class="flexbox-item-formular-box">
-            <div>
-                <h2>Carport med fladt tag</h2>
-                <p>Udfyld nedenstående omhyggeligt og tryk "Bestil tilbud".Så vender vi hurtigst muligt tilbage med et tilbud til dig.</p>
-                <form action="/SendRequest" method="post">
-                    <div class="form-group">
-                        <label for="carportWidth">Carport bredde *</label>
-                        <select id="carportWidth" name="carportWidth">
-                            <option value="" disabled selected>Vælg bredde</option>
-                            <option value="240">240 cm</option>
-                            <option value="270">270 cm</option>
-                            <option value="300">300 cm</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="carportLength">Carport længde *</label>
-                        <select id="carportLength" name="carportLength">
-                            <option value="" disabled selected>Vælg længde</option>
-                            <option value="210">210 cm</option>
-                            <option value="220">220 cm</option>
-                            <option value="230">230 cm</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="carportRoof">Carport trapeztag *</label>
-                        <select id="carportRoof" name="carportRoof">
-                            <option value="" disabled selected>Tag</option>
-                            <option value="0">Uden tagplader</option>
-                            <option value="1">Plasttrapezplader</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="carportShedWidth">Carport skur bredde *</label>
-                        <select id="carportShedWidth" name="carportShedWidth">
-                            <option value="" disabled selected>Vælg bredde</option>
-                            <option value="0">intet skur</option>
-                            <option value="270">270 cm</option>
-                            <option value="300">300 cm</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="carportShedLength">Carport skur længde *</label>
-                        <select id="carportShedLength" name="carportShedLength">
-                            <option value="" disabled selected>Vælg højde</option>
-                            <option value="0">intet skur</option>
-                            <option value="210">210 cm</option>
-                            <option value="220">220 cm</option>
-                            <option value="230">230 cm</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="city">By *</label>
-                        <select id="city" name="city">
-                            <option value="" disabled selected>Vælg højde</option>
-                            <option value="Bobville">Bobville</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="postalcode">Postnummer *</label>
-                        <select id="postalcode" name="postalcode">
-                            <option value="" disabled selected>Vælg højde</option>
-                            <option value="4242">4242</option>
-                        </select>
-                    </div>
-                    <label for="adress">Adresse:</label>
-                    <input type="text" id="adress" name="adress">
-                    <button type="submit">Bestil tilbud</button>
-                </form>
-            </div>
-            <div th:if="${errmsg != null}" class="alert-error" th:text="${errmsg}"></div>
-            <div th:if="${successTxt != null}" class="alert-success" th:text="${successTxt}"></div>
-        </div>
+<div class="flexbox-item-upperbanner">
+    <th:block th:insert="~{/fragments.html :: header}"></th:block>
+    <div class="header-menu-item" th:if="${user != null}">
+        <label class="header-menu-button-loggedintext">Logget på</label>
     </div>
+</div>
+<div class="page">
+    <h1>Bestil Quick-Byg tilbud - carport med fladt tag</h1>
+    <p>Med et specialudviklet computerprogram kan vi lynhurtigt beregne prisen og udskrive en skitsetegning på en carport indenfor vores standardprogram. Tilbud og skitsetegning fremsendes med post hurtigst muligt. Ved bestilling medfølger standardbyggevejledning.</p>
+    <p>Udfyld formularen omhyggeligt og klik på "Bestil tilbud". Felter markeret med * SKAL udfyldes!</p>
+    <div class="form">
+        <h2>Carport med fladt tag</h2>
+        <p>Udfyld nedenstående omhyggeligt og tryk "Bestil tilbud". Så vender vi hurtigst muligt tilbage med et tilbud til dig.</p>
+        <form action="/SendRequest" method="post">
+            <div class="form-item">
+                <label class="form-label" for="carportWidth">Carport bredde <span class="field-required">*</span></label>
+                <select class="field" id="carportWidth" name="carportWidth">
+                    <option value="" disabled selected>Vælg bredde</option>
+                    <th:block th:each="w:${widths}">
+                        <option th:value="${w}" th:text="${w}/10+'cm'"></option>
+                    </th:block>
+                </select>
+            </div>
+            <div class="form-item">
+                <label class="form-label" for="carportLength">Carport længde <span class="field-required">*</span></label>
+                <select class="field" id="carportLength" name="carportLength">
+                    <option value="" disabled selected>Vælg længde</option>
+                    <th:block th:each="l:${lengths}">
+                        <option th:value="${l}" th:text="${l}/10+'cm'"></option>
+                    </th:block>
+                </select>
+            </div>
+            <div class="form-item">
+                <label class="form-label" for="text">Evt. bemærkning / særlige ønsker</label>
+                <textarea class="field" id="text" name="text"></textarea>
+            </div>
+            <div class="form-item" style="border-top: 2px solid black">
+            </div>
+            <!-- TODO:
+            <div class="form-group">
+                <label for="carportShedWidth">Carport skur bredde *</label>
+                <select id="carportShedWidth" name="carportShedWidth">
+                    <option value="" disabled selected>Vælg bredde</option>
+                    <option value="0">intet skur</option>
+                    <option value="270">270 cm</option>
+                    <option value="300">300 cm</option>
+                </select>
+                <label for="carportShedLength">Carport skur længde *</label>
+                <select id="carportShedLength" name="carportShedLength">
+                    <option value="" disabled selected>Vælg højde</option>
+                    <option value="0">intet skur</option>
+                    <option value="210">210 cm</option>
+                    <option value="220">220 cm</option>
+                    <option value="230">230 cm</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="postalcode">Postnummer *</label>
+                <input id="postalcode" type="number" name="postalcode" placeholder="Postnummer" required>
+            </div>
+            <label for="adress">Adresse:</label>
+            <input type="text" id="adress" name="adress" placeholder="Addresse (vej + nummer)">
+            -->
+            <div class="form-item">
+                <button class="form-button" type="submit">Bestil tilbud</button>
+            </div>
+            <div class="form-item">
+                <div th:if="${errmsg != null}" class="alert-error" th:text="${errmsg}"></div>
+                <div th:if="${successTxt != null}" class="alert-success" th:text="${successTxt}"></div>
+            </div>
+        </form>
+    </div>
+</div>
 </body>
 </html>

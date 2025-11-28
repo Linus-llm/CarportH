@@ -43,8 +43,9 @@ public class SalesController {
         try {
             user = ctx.sessionAttribute("user");
             assert user != null;
-            offers = OfferMapper.getSalespersonOffers(Server.connectionPool, user.id);
+            offers = OfferMapper.getOpenOffers(Server.connectionPool);
             ctx.attribute("offers", offers);
+            ctx.attribute("user", user);
             ctx.render(Path.Template.SALES);
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
@@ -60,7 +61,7 @@ public class SalesController {
                 offer = OfferMapper.getOffer(Server.connectionPool, offerId);
                 ctx.sessionAttribute("offer", offer);
             }
-            if (offer == null || offer.status != OfferStatus.SALESPERSON) {
+            if (offer == null) {
                 ctx.status(404);
                 return;
             }
@@ -121,6 +122,7 @@ public class SalesController {
             return;
         }
         try {
+            offer.text = ctx.formParam("text");
             offer.status = OfferStatus.CUSTOMER;
             OfferMapper.updateOffer(Server.connectionPool, offer);
         } catch (SQLException e) {
