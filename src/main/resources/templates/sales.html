@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sales</title>
+    <title>Sægler view</title>
     <style>
         .offer {
             border: 1px solid black;
@@ -17,7 +17,6 @@
     </style>
 </head>
 <body>
-
     <th:block th:each="offer:${offers}">
         <div class="offer">
             <label>Tilbud nr</label>
@@ -25,7 +24,7 @@
             <br>
             <label>Carport</label>
             <span th:text="${offer.width}/1000+' x '+${offer.length}/1000+' mtr.'"></span><br>
-            <a th:if="${offer.status == (@app.db.OfferStatus@SALESPERSON)}" th:href="@{/sales/new-offer/{id} (id=${offer.id})}">
+            <a th:href="@{/sales/new-offer/{id} (id=${offer.id})}">
                 <button type="button">Lav tilbud</button>
             </a>
         </div>

@@ -53,24 +53,24 @@ public class Offer {
             int customerId,
             String address,
             int postalcode,
-            String city,
             int width,
             int height,
             int length,
             int shedWidth,
             int shedLength,
+            String text,
             OfferStatus status)
     {
         this.id = id;
         this.customerId = customerId;
         this.address = address;
         this.postalcode = postalcode;
-        this.city = city;
         this.width = width;
         this.height = height;
         this.length = length;
         this.shedWidth = shedWidth;
         this.shedLength = shedLength;
+        this.text = text;
         this.status = status;
     }
 }

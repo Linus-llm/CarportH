@@ -13,19 +13,14 @@
       <button class="header-menu-button-FOG" type="submit">FOG</button>
     </a>
   </div>
-  <div class="header-menu-item">
-    <a href="/offer">
-      <button class="header-menu-button-tilbud" type="submit">Tilbud</button>
+  <div th:if="${user != null}" class="header-menu-item">
+    <a href="/customer/offers">
+      <button class="header-menu-button-tilbud" type="button">Tilbud</button>
     </a>
   </div>
-  <div class="header-menu-item">
+  <div th:if="${user == null}" class="header-menu-item">
     <a href="/login">
       <button class="header-menu-button-login" type="button">Log in</button>
-    </a>
-  </div>
-  <div class="header-menu-item">
-    <a href="/query">
-      <button class="header-menu-button-forespørgsel" type="button">Forespørgsel</button>
     </a>
   </div>
   <div class="header-menu-item" th:if="${user != null and user.role.name() == 'SALESPERSON'}">
