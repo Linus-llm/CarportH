@@ -17,16 +17,29 @@
     </style>
 </head>
 <body>
-    <th:block th:each="offer:${offers}">
+    <th:block th:each="offer:${myOffers}">
         <div class="offer">
             <label>Tilbud nr</label>
             <span th:text="${offer.id}"></span>
             <br>
             <label>Carport</label>
             <span th:text="${offer.width}/1000+' x '+${offer.length}/1000+' mtr.'"></span><br>
-            <a th:href="@{/sales/new-offer/{id} (id=${offer.id})}">
+            <a th:if="${offer.status}==${@app.db.OfferStatus@SALESPERSON}" th:href="@{/sales/new-offer/{id} (id=${offer.id})}">
                 <button type="button">Lav tilbud</button>
             </a>
+        </div>
+        <br>
+    </th:block>
+    <th:block th:each="offer:${unassignedOffers}">
+        <div class="offer">
+            <label>Tilbud nr</label>
+            <span th:text="${offer.id}"></span>
+            <br>
+            <label>Carport</label>
+            <span th:text="${offer.width}/1000+' x '+${offer.length}/1000+' mtr.'"></span><br>
+            <form method="post" th:action="@{/sales/claim-offer/{id} (id=${offer.id})}">
+                <button type="submit">Assign</button>
+            </form>
         </div>
         <br>
     </th:block>
