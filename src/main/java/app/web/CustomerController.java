@@ -64,6 +64,7 @@ public class CustomerController{
                 text = text.substring(0, 1024);
             int customerId = user.id;
 
+            //test
             //dummy data insert for testing customerPage
             int salespersonId = 1;
             String city = "København";
