@@ -102,6 +102,12 @@
             </div>
             <button type="submit">Beregn stykliste --></button>
         </form>
+        <div class="frame">
+            <h3>Evt. bemærkning / særlige ønsker</h3>
+            <div class="frame-text">
+                <p th:text="${offer.text}"></p>
+            </div>
+        </div>
     </div>
     <div id="matlist" class="tabcontent">
         <h2>Stykliste:</h2>
@@ -164,6 +170,8 @@
             </div>
         </div>
         <form method="POST" action="/sales/send-offer">
+            <label for="text">Evt. bemærkning</label>
+            <textarea id="text" name="text"></textarea>
             <button type="submit">Send tilbud</button>
         </form>
     </div>

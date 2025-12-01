@@ -1,13 +1,12 @@
 package app.web;
 
-import app.db.OfferMapper;
-import app.db.Offer;
-import app.db.OfferStatus;
-import app.db.User;
+import app.db.*;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class CustomerController{
 
@@ -15,10 +14,18 @@ public class CustomerController{
     {
         app.get(Path.Web.INDEX, CustomerController::serveIndexPage);
         app.post(Path.Web.SEND_REQUEST, CustomerController::handleFormPost);
+        app.get(Path.Web.USER_OFFERS, CustomerController::serveOffersPage);
     }
 
     public static void serveIndexPage(Context ctx) {
         User user = ctx.sessionAttribute("user");
+
+        // TODO: get possible dimensions from db
+        int[] widths = new int[]{3000, 6000};//WoodMapper.getWood(Server.connectionPool, WoodCategory.RAFTERS, 0).toArray(new int[0]);
+        int[] lengths = new int[]{3000, 6000};//WoodMapper.getWood(Server.connectionPool, WoodCategory.RAFTERS, 0).toArray(new int[0]);
+        ctx.attribute("widths", widths);
+        ctx.attribute("lengths", lengths);
+
         ctx.attribute("user", user);
         ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
         ctx.attribute("successTxt", ctx.sessionAttribute("successTxt"));
@@ -31,38 +38,59 @@ public class CustomerController{
     {
         //TODO tilføj check af user ikke er null
 
-            User user = ctx.sessionAttribute("user");
-            Offer offer = null;
-        if (user!=null && ctx.formParam("carportWidth") != null && ctx.formParam("carportLength") != null &&
-                ctx.formParam("carportShedWidth") != null && ctx.formParam("carportShedLength") != null &&
-                ctx.formParam("adress") != null && ctx.formParam("postalcode") != null &&
-                ctx.formParam("city") != null) {
+        Offer offer;
+        User user = ctx.sessionAttribute("user");
+        if (user == null) { // FIXME: for debugging
+            user = new User(1, "ole", "ole@customer.dk", UserRole.SALESPERSON);
+            ctx.sessionAttribute("user", user);
+        }
+        try {
             int carportWidth = Integer.parseInt(ctx.formParam("carportWidth"));
             int carportLength = Integer.parseInt(ctx.formParam("carportLength"));
-            int carportShedWidth = Integer.parseInt(ctx.formParam("carportShedWidth"));
-            int carportShedLength = Integer.parseInt(ctx.formParam("carportShedLength"));
-            String adress = ctx.formParam("adress");
-            int postalcode = Integer.parseInt(ctx.formParam("postalcode"));
-            String city = ctx.formParam("city");
+            int carportShedWidth = 0;
+            int carportShedLength = 0;
+            String adress = "address";
+            int postalcode = 4242;
             int height = 2215; // default height
+            String text = ctx.formParam("text");
+            if (text == null)
+                text = "";
+            if (text.length() >= 1024)
+                text = text.substring(0, 1024);
             int customerId = user.id;
+            offer = new Offer(0, customerId, adress, postalcode, carportWidth, height, carportLength, carportShedWidth, carportShedLength, text, OfferStatus.SALESPERSON);
+            if (!OfferMapper.addQuery(Server.connectionPool, offer))
+                throw new Exception("addQuery failed");
 
-
-            offer = new Offer(0, customerId, adress, postalcode, city, carportWidth, height, carportLength, carportShedWidth, carportShedLength, OfferStatus.SALESPERSON);
-                try {
-                    OfferMapper.addQuery(Server.connectionPool, offer);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-
-        }else {
-            ctx.sessionAttribute("errmsg", "* Fyld venligst alle felter ud");
+            ctx.sessionAttribute("successTxt", "* Din forespørgsel er sendt!");
             ctx.redirect(Path.Web.INDEX);
-            return;
+        } catch (Exception e) {
+            System.out.println("ERROR: "+e.getMessage());
+            ctx.sessionAttribute("errmsg", "* Din forespørgsel kunne ikke sendes!");
+            ctx.redirect(Path.Web.INDEX);
         }
-        ctx.sessionAttribute("successTxt", "* Din forespørgsel er sendt!");
-        ctx.redirect(Path.Web.INDEX);
 
+    }
+
+    public static void serveOffersPage(Context ctx)
+    {
+        try {
+            User user = ctx.sessionAttribute("user");
+            if (user == null) {
+                ctx.sessionAttribute("loginredirect", Path.Web.USER_OFFERS);
+                ctx.redirect(Path.Web.LOGIN);
+                return;
+            }
+
+            List<Offer> offers = OfferMapper.getCustomerOffers(Server.connectionPool, user.id);
+
+            ctx.attribute("user", user);
+            ctx.attribute("offers", offers);
+            ctx.render(Path.Template.USER_OFFERS);
+        } catch (Exception e) {
+            System.out.println("ERROR: " + e.getMessage());
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

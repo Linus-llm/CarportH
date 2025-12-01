@@ -53,6 +53,12 @@ public class OfferMapper {
         return getOffersWhere(cp, "WHERE customer_id=?", customerId);
     }
 
+    public static List<Offer> getOpenOffers(ConnectionPool cp)
+            throws SQLException
+    {
+        return getOffersWhere(cp, "WHERE salesperson_id IS NULL");
+    }
+
     public static List<Offer> getSalespersonOffers(ConnectionPool cp, int salespersonId)
             throws SQLException
     {
@@ -101,7 +107,7 @@ public class OfferMapper {
     public static boolean addQuery(ConnectionPool cp, Offer offer)
             throws SQLException
     {
-        String sql = "INSERT INTO offers (customer_id, address, postalcode, width, height, length, shed_width, shed_length, status) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO offers (customer_id, address, postalcode, width, height, length, shed_width, shed_length, text, status) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = cp.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
             int i = 0;
@@ -113,6 +119,7 @@ public class OfferMapper {
             ps.setInt(++i, offer.length);
             ps.setInt(++i, offer.shedWidth);
             ps.setInt(++i, offer.shedLength);
+            ps.setString(++i, offer.text);
             ps.setInt(++i, offer.status.ordinal());
             if (ps.executeUpdate() != 1) return false;
             try (ResultSet keys = ps.getGeneratedKeys()) {
