@@ -11,5 +11,11 @@ public enum OfferStatus {
 
     // The customer has accepted the offer
     // by paying. Now they can get a PDF
-    ORDERED
+    ORDERED,
+
+    // For the customer to accept an incoming offer
+    ACCEPTED,
+
+    // For the customer to reject an incoming offer
+    REJECTED
 }
