@@ -17,6 +17,7 @@ public class SalesController {
         app.get(Path.Web.SALES_NEW_OFFER, SalesController::serveNewOfferPage);
         app.post(Path.Web.SALES_CALC, SalesController::handleCalcPost);
         app.post(Path.Web.SALES_SEND_OFFER, SalesController::handleSendOfferPost);
+        app.post("/sales/claim-offer/{id}", SalesController::handleClaimOffer);
     }
 
     public static void before(Context ctx) {
@@ -43,7 +44,14 @@ public class SalesController {
         try {
             user = ctx.sessionAttribute("user");
             assert user != null;
-            offers = OfferMapper.getOpenOffers(Server.connectionPool);
+            //har en sælger
+            List<Offer> myOffers = OfferMapper.getSalespersonOffers(Server.connectionPool, user.id);
+            //har ikk en sælger
+            List<Offer> unassignedOffers = OfferMapper.getUnassignedOffers(Server.connectionPool);
+            ctx.attribute("myOffers", myOffers);
+            ctx.attribute("unassignedOffers", unassignedOffers);
+
+            offers = OfferMapper.getSalespersonOffers(Server.connectionPool, user.id);
             ctx.attribute("offers", offers);
             ctx.attribute("user", user);
             ctx.render(Path.Template.SALES);
@@ -132,4 +140,21 @@ public class SalesController {
         }
         ctx.redirect(Path.Web.SALES);
     }
+    public static void handleClaimOffer(Context ctx) {
+        User user = ctx.sessionAttribute("user");
+        if (user == null || user.role != UserRole.SALESPERSON) {
+            ctx.status(403);
+            return;
+        }
+
+        int offerId = Integer.parseInt(ctx.pathParam("id"));
+        try {
+            OfferMapper.assignSalesperson(Server.connectionPool, offerId, user.id);
+            ctx.redirect(Path.Web.SALES);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            ctx.status(500);
+        }
+    }
+
 }

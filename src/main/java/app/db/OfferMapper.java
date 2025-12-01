@@ -160,4 +160,26 @@ public class OfferMapper {
             return ps.executeUpdate() == 1;
         }
     }
+    // her henter vi all forespørgelser der venter på en sælger
+    public static List<Offer> getUnassignedOffers(ConnectionPool cp)
+            throws SQLException
+    {
+        return getOffersWhere(cp,
+                "WHERE salesperson_id IS NULL AND status=?",
+                OfferStatus.SALESPERSON.ordinal());
+    }
+
+    // sølgeren for tildelt et tilbud
+    public static boolean assignSalesperson(ConnectionPool cp, int offerId, int salespersonId)
+            throws SQLException
+    {
+        String sql = "UPDATE offers SET salesperson_id=? WHERE id=?";
+        try (Connection conn = cp.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, salespersonId);
+            ps.setInt(2, offerId);
+            return ps.executeUpdate() == 1;
+        }
+    }
 }
