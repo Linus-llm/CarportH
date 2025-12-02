@@ -28,7 +28,7 @@ public class CustomerController{
     public static void serveIndexPage(Context ctx) {
         User user = ctx.sessionAttribute("user");
 
-        // TODO: get possible dimensions from db
+        // TODO: get possible dimensions from DB
         int[] widths = new int[]{3000, 6000};//WoodMapper.getWood(Server.connectionPool, WoodCategory.RAFTERS, 0).toArray(new int[0]);
         int[] lengths = new int[]{3000, 6000};//WoodMapper.getWood(Server.connectionPool, WoodCategory.RAFTERS, 0).toArray(new int[0]);
         ctx.attribute("widths", widths);
