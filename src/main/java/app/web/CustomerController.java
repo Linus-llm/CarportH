@@ -21,6 +21,8 @@ public class CustomerController{
         app.post("/offers/{id}/reject", CustomerController::handleReject);
         app.post("/offers/{id}/message", CustomerController::handleMessage);
         app.get(Path.Web.USER_OFFERS, CustomerController::serveOffersPage);
+
+        app.get("/orderConfirmation", ctx -> ctx.render("orderConfirmation.html"));
     }
 
     public static void serveIndexPage(Context ctx) {
