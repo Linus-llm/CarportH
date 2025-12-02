@@ -53,12 +53,6 @@ public class OfferMapper {
         return getOffersWhere(cp, "WHERE customer_id=?", customerId);
     }
 
-    public static List<Offer> getOpenOffers(ConnectionPool cp)
-            throws SQLException
-    {
-        return getOffersWhere(cp, "WHERE salesperson_id IS NULL");
-    }
-
     public static List<Offer> getSalespersonOffers(ConnectionPool cp, int salespersonId)
             throws SQLException
     {
