@@ -7,6 +7,7 @@ import io.javalin.http.HandlerType;
 import io.javalin.http.HttpStatus;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SalesController {
@@ -108,17 +109,71 @@ public class SalesController {
             ctx.status(HttpStatus.BAD_REQUEST);
             return;
         }
-        offer.width = (int)(Float.parseFloat(w)*1000);
-        offer.length = (int)(Float.parseFloat(l)*1000);
-        offer.height = (int)(Float.parseFloat(h)*1000);
-        // TODO: calculate mat list
+        offer.width = (int) (Float.parseFloat(w) * 1000);
+        offer.length = (int) (Float.parseFloat(l) * 1000);
+        offer.height = (int) (Float.parseFloat(h) * 1000);
 
-        path = Path.Web.SALES_NEW_OFFER;
-        idx = path.indexOf('{');
-        path = path.substring(0, idx);
-        path += offer.id;
-        ctx.sessionAttribute("defaultTab", "tab-matlist");
-        ctx.redirect(path);
+        // TODO: calculate mat list
+        CarportCalculator calculator = new CarportCalculator();
+        List<WoodNeed> needs = calculator.calculateNeeds(offer.length, offer.width, offer.height);
+
+        List<Bill> bills = new ArrayList<>();
+
+        try {
+            for (WoodNeed need : needs) {
+
+                WoodCategory category = switch (need.type) {
+                    case PILLAR -> WoodCategory.PILLAR;
+                    case RAFTER -> WoodCategory.RAFTER;
+                    case BOARD -> WoodCategory.BOARD;
+                };
+                // 4. Use WoodMapper to get a stock wood piece with sufficient length
+                Wood wood = null;
+                try {
+                    wood = WoodMapper.getWood(Server.connectionPool, category, need.requiredLengthMm);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                if (wood == null) {
+                    // handle "no suitable wood found" – for now you can just continue or throw
+                    continue;
+                }
+
+                // 5. Calculate line price
+                // price per meter * wood length (meters) * quantity
+                double pricePerMeter = wood.pricePerMeter;
+                double lengthMeters  = wood.length / 1000.0;
+                double linePrice     = pricePerMeter * lengthMeters * need.count;
+                // 6. Create bill object
+                Bill bill = new Bill(
+                        offer.id,
+                        wood.id,       // the woods.id from DB
+                        need.count,
+                        linePrice
+                );
+
+                BillMapper.insert(Server.connectionPool, bill);
+
+                bills.add(bill);
+            }
+            double total = bills.stream().mapToDouble(b -> b.price).sum();
+
+            offer.price = total;
+            OfferMapper.updatePrice(Server.connectionPool, offer.id, total);
+
+        } catch(Exception e){
+                System.out.println("ERROR: " + e.getMessage());
+                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+
+            path = Path.Web.SALES_NEW_OFFER;
+            idx = path.indexOf('{');
+            path = path.substring(0, idx);
+            path += offer.id;
+            ctx.sessionAttribute("defaultTab", "tab-matlist");
+            ctx.redirect(path);
+
     }
 
     public static void handleSendOfferPost(Context ctx) {
@@ -156,5 +211,9 @@ public class SalesController {
             ctx.status(500);
         }
     }
+
+
+
+
 
 }
