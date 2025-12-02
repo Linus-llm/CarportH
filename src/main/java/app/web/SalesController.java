@@ -113,52 +113,54 @@ public class SalesController {
         offer.length = (int) (Float.parseFloat(l) * 1000);
         offer.height = (int) (Float.parseFloat(h) * 1000);
 
-        // TODO: calculate mat list
+
+        // we calculate the needed wood pieces based on carport dimensions
         CarportCalculator calculator = new CarportCalculator();
         List<WoodNeed> needs = calculator.calculateNeeds(offer.length, offer.width, offer.height);
 
+        // we create bills list
         List<Bill> bills = new ArrayList<>();
 
         try {
+            // we loop through each needed wood piece
             for (WoodNeed need : needs) {
 
-                WoodCategory category = switch (need.type) {
-                    case PILLAR -> WoodCategory.PILLAR;
-                    case RAFTER -> WoodCategory.RAFTER;
-                    case BOARD -> WoodCategory.BOARD;
-                };
-                // 4. Use WoodMapper to get a stock wood piece with sufficient length
                 Wood wood = null;
+                // thus we find a suitable wood piece from the DB with getWood
                 try {
-                    wood = WoodMapper.getWood(Server.connectionPool, category, need.requiredLengthMm);
+                    wood = WoodMapper.getWood(Server.connectionPool, need.type, need.requiredLengthMm);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
                 if (wood == null) {
-                    // handle "no suitable wood found" – for now you can just continue or throw
+                    // TODO: no suitable wood found, handle this case
                     continue;
                 }
 
-                // 5. Calculate line price
-                // price per meter * wood length (meters) * quantity
+                // now we have found our wood piece
+                // now we need to calculate the price for this line item
                 double pricePerMeter = wood.pricePerMeter;
+                //to get the length in meters we divide by 1000
                 double lengthMeters  = wood.length / 1000.0;
                 double linePrice     = pricePerMeter * lengthMeters * need.count;
-                // 6. Create bill object
+                // we then create a bill object for this line item
                 Bill bill = new Bill(
                         offer.id,
                         wood.id,       // the woods.id from DB
                         need.count,
                         linePrice
                 );
-
+                //we call the insert to save it to the DB
                 BillMapper.insert(Server.connectionPool, bill);
 
+                // then we add the line to the create bills list
                 bills.add(bill);
             }
+            // we calculate the total price of the bill by summing up each line price
             double total = bills.stream().mapToDouble(b -> b.price).sum();
-
+            //we set the offer price to the total of the bill list
             offer.price = total;
+            //then we update the offer in the DB
             OfferMapper.updatePrice(Server.connectionPool, offer.id, total);
 
         } catch(Exception e){

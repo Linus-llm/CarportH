@@ -9,6 +9,7 @@ public class Wood {
     public int length;
     public double pricePerMeter;
 
+    //Constructor for wood entity it holds price per meter which comes from wood profile in the database
     public Wood(int id, int profileId, WoodCategory category, int width, int height, int length, double pricePerMeter) {
         this.id = id;
         this.profileId = profileId;

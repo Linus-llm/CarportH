@@ -34,4 +34,14 @@ public class TestCalculator {
 
         assertEquals(4, c.calcNumberOfBoardsCoverWidth(5999, 3000));
     }
+    @Test
+    public void testCalculateNeeds(){
+        int length = 6000;
+        int width = 4000;
+        int height = 2215;
+        List<WoodNeed> needs = c.calculateNeeds(length, width, height);
+        for (WoodNeed n : needs) {
+            System.out.println(n.type + " | length≥" + n.requiredLengthMm + " | count=" + n.count);
+        }
+    }
 }

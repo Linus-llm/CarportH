@@ -7,6 +7,8 @@ import java.sql.SQLException;
 
 public class WoodMapper {
 
+    //This method retrieves a wood piece from the database that matches the specified category of wood and has a length greater than or equal to the desired length.
+    //The sql query is very specific about using the best matched length and not just any piece that is longer than the required length.
     public static Wood getWood(ConnectionPool cp, WoodCategory category, int wishLength) throws SQLException {
         String sql =
                 "SELECT w.id AS wood_id, w.length, " +

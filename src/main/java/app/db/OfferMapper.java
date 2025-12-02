@@ -183,6 +183,7 @@ public class OfferMapper {
         }
     }
 
+    // used to update the price of an offer
     public static boolean updatePrice(ConnectionPool cp, int offerId, double newPrice)
             throws SQLException
     {
