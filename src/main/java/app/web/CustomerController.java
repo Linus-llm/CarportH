@@ -64,7 +64,7 @@ public class CustomerController{
                 text = text.substring(0, 1024);
             int customerId = user.id;
 
-            //test
+
             //dummy data insert for testing customerPage
             int salespersonId = 1;
             String city = "København";
@@ -73,7 +73,7 @@ public class CustomerController{
             offer = new Offer(0, customerId, salespersonId, adress, postalcode, city, carportWidth, height, carportLength, carportShedWidth, carportShedLength, price, text, OfferStatus.SALESPERSON);
             if (!OfferMapper.addQuery(Server.connectionPool, offer))
                 throw new Exception("addQuery failed");
-
+            //tester
             ctx.sessionAttribute("successTxt", "* Din forespørgsel er sendt!");
             ctx.redirect(Path.Web.INDEX);
         } catch (Exception e) {
