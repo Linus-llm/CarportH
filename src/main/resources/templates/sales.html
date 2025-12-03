@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <title>Sægler view</title>
     <style>
+        body {
+            background: #efefef;
+        }
+        .offer-container {
+            width: 50%;
+        }
+        .clear {
+            border-top: 2px solid black;
+            width: 100%;
+            padding: 6px;
+        }
         .offer {
             border: 1px solid black;
             padding: 6px;
@@ -17,7 +28,15 @@
     </style>
 </head>
 <body>
-    <th:block th:each="offer:${myOffers}">
+    <div class="alert-error" th:if="${errmsg}!=null" th:text="${errmsg}"></div>
+    <div>
+        <form method="POST" action="/sales/find-offer">
+            <input type="text" id="offerId" name="offerId" placeholder="Tilbud nr" required>
+            <button type="submit">Søg</button>
+        </form>
+    </div>
+    <div class="clear"></div>
+    <div class="offer-container" th:each="offer:${myOffers}">
         <div class="offer">
             <label>Tilbud nr</label>
             <span th:text="${offer.id}"></span>
@@ -29,8 +48,9 @@
             </a>
         </div>
         <br>
-    </th:block>
-    <th:block th:each="offer:${unassignedOffers}">
+    </div>
+    <div class="clear"></div>
+    <div class="offer-container" th:each="offer:${unassignedOffers}">
         <div class="offer">
             <label>Tilbud nr</label>
             <span th:text="${offer.id}"></span>
@@ -42,6 +62,6 @@
             </form>
         </div>
         <br>
-    </th:block>
+    </div>
 </body>
 </html>

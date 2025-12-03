@@ -54,9 +54,12 @@ public class SalesController {
             offers = OfferMapper.getSalespersonOffers(Server.connectionPool, user.id);
             ctx.attribute("offers", offers);
             ctx.attribute("user", user);
+
+            ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
             ctx.render(Path.Template.SALES);
+            ctx.sessionAttribute("errmsg", null);
         } catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
+            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -64,15 +67,21 @@ public class SalesController {
     public static void serveNewOfferPage(Context ctx) {
         try {
             int offerId = Integer.parseInt(ctx.pathParam("id"));
-            Offer offer = ctx.sessionAttribute("offer");
-            if (offer == null || offer.id != offerId) {
-                offer = OfferMapper.getOffer(Server.connectionPool, offerId);
-                ctx.sessionAttribute("offer", offer);
-            }
+            Offer offer;
+            offer = OfferMapper.getOffer(Server.connectionPool, offerId);
             if (offer == null) {
                 ctx.status(404);
                 return;
             }
+            User seller = ctx.sessionAttribute("user");
+            assert seller != null;
+            if (offer.salespersonId != seller.id || offer.status != OfferStatus.SALESPERSON) {
+                ctx.status(404);
+                return;
+            }
+
+            // set as session attribute for form POST's
+            ctx.sessionAttribute("offer", offer);
             // TODO: List<Bill> bills = BillMapper.getBills(Server.connectionPool, offerId);
             // ctx.attribute("bills", bills);
             User customer = UserMapper.getUser(Server.connectionPool, offer.customerId);
@@ -85,7 +94,7 @@ public class SalesController {
             ctx.sessionAttribute("defaultTab", "tab-dimensions");
             ctx.render(Path.Template.SALES_NEW_OFFER);
         } catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
+            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -134,7 +143,7 @@ public class SalesController {
             offer.status = OfferStatus.CUSTOMER;
             OfferMapper.updateOffer(Server.connectionPool, offer);
         } catch (SQLException e) {
-            System.out.println("ERROR: "+e.getMessage());
+            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             return;
         }
@@ -152,9 +161,8 @@ public class SalesController {
             OfferMapper.assignSalesperson(Server.connectionPool, offerId, user.id);
             ctx.redirect(Path.Web.SALES);
         } catch (SQLException e) {
-            e.printStackTrace();
-            ctx.status(500);
+            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }

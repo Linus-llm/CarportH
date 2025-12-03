@@ -41,6 +41,17 @@ public class Server {
             config.staticFiles.add("/public");
         });
 
+        app.exception(java.io.FileNotFoundException.class, (e, ctx) -> {
+            ctx.status(404);
+        });
+        app.exception(org.thymeleaf.exceptions.TemplateInputException.class, (e, ctx) -> {
+            ctx.status(404);
+        });
+        app.exception(Exception.class, (e, ctx) -> {
+            e.printStackTrace();
+            ctx.status(500);
+        });
+
         // setup routes
         UserController.addRoutes(app);
         CustomerController.addRoutes(app);
