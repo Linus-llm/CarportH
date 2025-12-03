@@ -74,14 +74,15 @@ public class SalesController {
                 ctx.status(404);
                 return;
             }
-            // TODO: List<Bill> bills = BillMapper.getBills(Server.connectionPool, offerId);
 
             List<Bill> bills = BillMapper.getBillsByOfferId(Server.connectionPool, offerId);
-
             ctx.attribute("bills", bills);
+
             User customer = UserMapper.getUser(Server.connectionPool, offer.customerId);
             ctx.attribute("customer", customer);
+
             ctx.attribute("offer", offer);
+
             String defaultTab = ctx.sessionAttribute("defaultTab");
             if (defaultTab == null)
                 defaultTab = "tab-dimensions";
