@@ -17,7 +17,7 @@ public class SalesController {
         app.get(Path.Web.SALES_NEW_OFFER, SalesController::serveNewOfferPage);
         app.post(Path.Web.SALES_CALC, SalesController::handleCalcPost);
         app.post(Path.Web.SALES_SEND_OFFER, SalesController::handleSendOfferPost);
-        app.post("/sales/claim-offer/{id}", SalesController::handleClaimOffer);
+        app.post(Path.Web.SALES_CLAIM_OFFER, SalesController::handleClaimOfferPost);
     }
 
     public static void before(Context ctx) {
@@ -55,9 +55,7 @@ public class SalesController {
             ctx.attribute("offers", offers);
             ctx.attribute("user", user);
 
-            ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
             ctx.render(Path.Template.SALES);
-            ctx.sessionAttribute("errmsg", null);
         } catch (Exception e) {
             System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -87,11 +85,13 @@ public class SalesController {
             User customer = UserMapper.getUser(Server.connectionPool, offer.customerId);
             ctx.attribute("customer", customer);
             ctx.attribute("offer", offer);
+
             String defaultTab = ctx.sessionAttribute("defaultTab");
             if (defaultTab == null)
                 defaultTab = "tab-dimensions";
             ctx.attribute("defaultTab", defaultTab);
             ctx.sessionAttribute("defaultTab", "tab-dimensions");
+
             ctx.render(Path.Template.SALES_NEW_OFFER);
         } catch (Exception e) {
             System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
@@ -149,12 +149,11 @@ public class SalesController {
         }
         ctx.redirect(Path.Web.SALES);
     }
-    public static void handleClaimOffer(Context ctx) {
+
+    public static void handleClaimOfferPost(Context ctx) {
         User user = ctx.sessionAttribute("user");
-        if (user == null || user.role != UserRole.SALESPERSON) {
-            ctx.status(403);
-            return;
-        }
+        assert user != null;
+        assert user.role == UserRole.SALESPERSON;
 
         int offerId = Integer.parseInt(ctx.pathParam("id"));
         try {

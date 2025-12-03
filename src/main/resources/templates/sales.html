@@ -25,16 +25,13 @@
             width: 6em;
             cursor: text;
         }
+        button {
+            cursor: pointer;
+        }
     </style>
+
 </head>
 <body>
-    <div class="alert-error" th:if="${errmsg}!=null" th:text="${errmsg}"></div>
-    <div>
-        <form method="POST" action="/sales/find-offer">
-            <input type="text" id="offerId" name="offerId" placeholder="Tilbud nr" required>
-            <button type="submit">Søg</button>
-        </form>
-    </div>
     <div class="clear"></div>
     <div class="offer-container" th:each="offer:${myOffers}">
         <div class="offer">
