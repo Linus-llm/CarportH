@@ -1,6 +1,7 @@
 package app.web;
 
 import app.db.*;
+import app.draw.CarportSVG;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HandlerType;
@@ -83,6 +84,14 @@ public class SalesController {
                 defaultTab = "tab-dimensions";
             ctx.attribute("defaultTab", defaultTab);
             ctx.sessionAttribute("defaultTab", "tab-dimensions");
+
+            // FIXME: use values from carport calculator
+            CarportSVG svg = new CarportSVG(600, 600, offer.width, offer.length);
+            svg.drawStraps(45, offer.length);
+            svg.drawRafters(45, 15, offer.length/14);
+            svg.drawPillars(97, 97, new int[]{1000, offer.length/2, offer.length-300});
+            ctx.attribute("svg", svg.toString());
+
             ctx.render(Path.Template.SALES_NEW_OFFER);
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
