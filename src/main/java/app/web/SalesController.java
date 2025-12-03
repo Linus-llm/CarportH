@@ -75,7 +75,10 @@ public class SalesController {
                 return;
             }
             // TODO: List<Bill> bills = BillMapper.getBills(Server.connectionPool, offerId);
-            // ctx.attribute("bills", bills);
+
+            List<Bill> bills = BillMapper.getBillsByOfferId(Server.connectionPool, offerId);
+
+            ctx.attribute("bills", bills);
             User customer = UserMapper.getUser(Server.connectionPool, offer.customerId);
             ctx.attribute("customer", customer);
             ctx.attribute("offer", offer);
@@ -144,12 +147,14 @@ public class SalesController {
                 double lengthMeters  = wood.length / 1000.0;
                 double linePrice     = pricePerMeter * lengthMeters * need.count;
                 // we then create a bill object for this line item
+                System.out.println("Creating bill for offerId = " + offer.id);
                 Bill bill = new Bill(
                         offer.id,
-                        wood.id,       // the woods.id from DB
+                        wood.id,
                         need.count,
                         linePrice
                 );
+                System.out.println("Bill.offerId = " + bill.offerId);
                 //we call the insert to save it to the DB
                 BillMapper.insert(Server.connectionPool, bill);
 

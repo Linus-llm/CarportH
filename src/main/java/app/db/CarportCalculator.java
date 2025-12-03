@@ -39,8 +39,8 @@ public class CarportCalculator {
             needs.add(new WoodNeed(WoodCategory.RAFTER, widthMm, rafterCount));
 
             // this adds the pieces of wood needed for the remme/boards
-            needs.add(new WoodNeed(WoodCategory.BOARD, lengthMm, 2));
-            needs.add(new WoodNeed(WoodCategory.BOARD, widthMm, 2));
+            needs.add(new WoodNeed(WoodCategory.BEAM, lengthMm, 2));
+            needs.add(new WoodNeed(WoodCategory.BEAM, widthMm, 2));
 
             // returns the full list of wood needed
             return needs;
