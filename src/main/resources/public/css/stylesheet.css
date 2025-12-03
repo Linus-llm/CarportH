@@ -251,7 +251,6 @@ body {
 
 .tilbud-list {
     background-color: var(--background-grey, #F5F5F5);
-    padding: 32px;
 }
 
 .tilbud-boks {
@@ -275,7 +274,7 @@ body {
     background-color: var(--signature-blue, #154985);
     color: #FFFFFF;
     border: none;
-    border-radius: 3px;
+    border-radius: 0px;
     padding: 8px 16px;
     cursor: pointer;
     font: inherit;
@@ -292,12 +291,12 @@ body {
 }
 
 .message-form textarea {
-    width: 100%;
+    width: 90%;
     margin-bottom: 12px;
     padding: 6px 8px;
     border: 1px solid #CCCCCC;
-    border-radius: 3px;
     font: inherit;
+    border-radius: 0px;
 }
 
 .visually-hidden {
@@ -309,4 +308,10 @@ body {
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     border: 0;
+}
+
+.offer-box {
+    background-color: white;
+    margin-bottom: 20px;
+    padding: 20px 20px;
 }
