@@ -1,4 +1,4 @@
-package app.db;
+package app.entities;
 
 public class Wood {
     public int profileId;

@@ -1,4 +1,4 @@
-package app.db;
+package app.entities;
 
 public enum OfferStatus {
     // A customer has generated an offer

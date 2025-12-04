@@ -1,4 +1,7 @@
-package app.db;
+package app.persistence;
+
+import app.entities.Offer;
+import app.entities.OfferStatus;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
