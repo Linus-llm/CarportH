@@ -60,4 +60,15 @@ public class TestDB {
         assertFalse(offers.isEmpty());
     }
 
+    @Test
+    public void testGetWood(){
+        try {
+            Wood wood = WoodMapper.getWood(cp, WoodCategory.PILLAR, 2000);
+            assertNotNull(wood);
+            System.out.println(wood.id+", "+wood.category+", "+wood.length+", "+wood.pricePerMeter);
+        } catch (SQLException e) {
+            fail(e);
+        }
+    }
+
 }

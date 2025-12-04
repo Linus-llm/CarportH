@@ -123,25 +123,14 @@
                         <th>Længde</th>
                         <th>Antal</th>
                     </tr>
-                    <tr>
-                        <td th:text="'45x195mm. '+${@app.web.Translator@translate('RAFTER')}"></td>
-                        <td>600</td>
-                        <td>2</td>
-                    </tr>
-                    <tr>
-                        <td>97x97 mm. Stolpe</td>
-                        <td>300</td>
-                        <td>11</td>
-                    </tr>
-                    <!-- TODO:
                      <th:block th:each="bill:${bills}">
-                        <tr >
-                            <td th:text="${bill.width}+'x'+${bill.height}+'mm'></td>
-                            <td th:text="${bill.length}"></td>
-                            <td th:text="${bill.number}></td>
                         <tr>
+                            <td th:text="${bill.width + 'x' + bill.height + 'mm. ' + @app.web.Translator@translate(bill.category)}"></td>
+                            <td th:text="${bill.length}"></td>
+                            <td th:text="${bill.quantity}"></td>
+                        </tr>
                      </th:block>
-                    -->
+
                 </table>
             </div>
         </div>
