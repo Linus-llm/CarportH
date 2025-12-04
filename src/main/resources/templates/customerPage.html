@@ -18,28 +18,13 @@
 
 <div class="tilbud-list">
 <section class="offer-box" th:each="offer : ${offers}">
-    <div style="border: 2px solid black">
-    <th:block th:if="${offer.status}==${@app.db.OfferStatus@SALESPERSON}">
-        <p th:text="${offer.id}"></p>
-        <p>Afventer svar</p>
-    </th:block>
-    <th:block th:if="${offer.status}==${@app.db.OfferStatus@CUSTOMER}">
-        <p th:text="${offer.id}"></p>
-        <p th:text="${offer.price}"></p>
-    </th:block>
-    <th:block th:if="${offer.status}==${@app.db.OfferStatus@ORDERED}">
-        <p th:text="${offer.id}"></p>
-        <p>Bestilt</p>
-    </th:block>
-    </div>
-    <!--
     <p class="label-line">
         Tilbud
     </p>
 
     <p class="label-line">
     <strong>Forespørgsel:</strong>
-    <span th:text="${offer.offerRequest}"></span>
+    <span th:text="${offer.text}"></span>
     </p>
 
     <p class="label-line">
@@ -77,7 +62,7 @@
             Send melding
         </button>
     </form>
--->
+
 </section>
 </div>
 </div>

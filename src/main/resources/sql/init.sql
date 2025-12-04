@@ -61,6 +61,8 @@ CREATE TABLE IF NOT EXISTS public.offers
     PRIMARY KEY (id)
 );
 
+
+
 CREATE TABLE IF NOT EXISTS public.bills
 (
     id serial NOT NULL,

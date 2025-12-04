@@ -1,12 +1,14 @@
 package app.web;
 
 import app.db.*;
+import app.draw.CarportSVG;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HandlerType;
 import io.javalin.http.HttpStatus;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SalesController {
@@ -82,8 +84,13 @@ public class SalesController {
             ctx.sessionAttribute("offer", offer);
             // TODO: List<Bill> bills = BillMapper.getBills(Server.connectionPool, offerId);
             // ctx.attribute("bills", bills);
+
+            List<Bill> bills = BillMapper.getBillsByOfferId(Server.connectionPool, offerId);
+            ctx.attribute("bills", bills);
+
             User customer = UserMapper.getUser(Server.connectionPool, offer.customerId);
             ctx.attribute("customer", customer);
+
             ctx.attribute("offer", offer);
 
             String defaultTab = ctx.sessionAttribute("defaultTab");
@@ -91,6 +98,13 @@ public class SalesController {
                 defaultTab = "tab-dimensions";
             ctx.attribute("defaultTab", defaultTab);
             ctx.sessionAttribute("defaultTab", "tab-dimensions");
+
+            // FIXME: use values from carport calculator
+            CarportSVG svg = new CarportSVG(600, 600, offer.width, offer.length);
+            svg.drawStraps(45, offer.length);
+            svg.drawRafters(45, 15, offer.length/14);
+            svg.drawPillars(97, 97, new int[]{1000, offer.length/2, offer.length-300});
+            ctx.attribute("svg", svg.toString());
 
             ctx.render(Path.Template.SALES_NEW_OFFER);
         } catch (Exception e) {
@@ -117,17 +131,75 @@ public class SalesController {
             ctx.status(HttpStatus.BAD_REQUEST);
             return;
         }
-        offer.width = (int)(Float.parseFloat(w)*1000);
-        offer.length = (int)(Float.parseFloat(l)*1000);
-        offer.height = (int)(Float.parseFloat(h)*1000);
-        // TODO: calculate mat list
+        offer.width = (int) (Float.parseFloat(w) * 1000);
+        offer.length = (int) (Float.parseFloat(l) * 1000);
+        offer.height = (int) (Float.parseFloat(h) * 1000);
 
-        path = Path.Web.SALES_NEW_OFFER;
-        idx = path.indexOf('{');
-        path = path.substring(0, idx);
-        path += offer.id;
-        ctx.sessionAttribute("defaultTab", "tab-matlist");
-        ctx.redirect(path);
+
+        // we calculate the needed wood pieces based on carport dimensions
+        CarportCalculator calculator = new CarportCalculator();
+        List<WoodNeed> needs = calculator.calculateNeeds(offer.length, offer.width, offer.height);
+
+        // we create bills list
+        List<Bill> bills = new ArrayList<>();
+
+        try {
+            // we loop through each needed wood piece
+            for (WoodNeed need : needs) {
+
+                Wood wood = null;
+                // thus we find a suitable wood piece from the DB with getWood
+                try {
+                    wood = WoodMapper.getWood(Server.connectionPool, need.type, need.requiredLengthMm);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                if (wood == null) {
+                    // TODO: no suitable wood found, handle this case
+                    continue;
+                }
+
+                // now we have found our wood piece
+                // now we need to calculate the price for this line item
+                double pricePerMeter = wood.pricePerMeter;
+                //to get the length in meters we divide by 1000
+                double lengthMeters  = wood.length / 1000.0;
+                double linePrice     = pricePerMeter * lengthMeters * need.count;
+                // we then create a bill object for this line item
+                System.out.println("Creating bill for offerId = " + offer.id);
+                Bill bill = new Bill(
+                        offer.id,
+                        wood.id,
+                        need.count,
+                        linePrice
+                );
+                System.out.println("Bill.offerId = " + bill.offerId);
+                //we call the insert to save it to the DB
+                BillMapper.insert(Server.connectionPool, bill);
+
+                // then we add the line to the create bills list
+                bills.add(bill);
+            }
+            // we calculate the total price of the bill by summing up each line price
+            double total = bills.stream().mapToDouble(b -> b.price).sum();
+            //we set the offer price to the total of the bill list
+            offer.price = total;
+            //then we update the offer in the DB
+            OfferMapper.updatePrice(Server.connectionPool, offer.id, total);
+
+        } catch(Exception e){
+                System.out.println("ERROR: " + e.getMessage());
+                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+
+            path = Path.Web.SALES_NEW_OFFER;
+            idx = path.indexOf('{');
+            path = path.substring(0, idx);
+            path += offer.id;
+            ctx.sessionAttribute("defaultTab", "tab-matlist");
+            ctx.redirect(path);
+
     }
 
     public static void handleSendOfferPost(Context ctx) {

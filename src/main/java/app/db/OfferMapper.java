@@ -176,4 +176,18 @@ public class OfferMapper {
             return ps.executeUpdate() == 1;
         }
     }
+
+    // used to update the price of an offer
+    public static boolean updatePrice(ConnectionPool cp, int offerId, double newPrice)
+            throws SQLException
+    {
+        String sql = "UPDATE offers SET price=? WHERE id=?";
+        try (Connection conn = cp.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setDouble(1, newPrice);
+            ps.setInt(2, offerId);
+            return ps.executeUpdate() == 1;
+        }
+    }
 }

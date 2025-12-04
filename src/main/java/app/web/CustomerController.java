@@ -14,13 +14,21 @@ public class CustomerController{
     {
         app.get(Path.Web.INDEX, CustomerController::serveIndexPage);
         app.post(Path.Web.SEND_REQUEST, CustomerController::handleFormPost);
+
+//      app.get(Path.Web.USER_OFFERS, CustomerController::serveUserOffersPage);
+
+        app.post("/offers/{id}/accept", CustomerController::handleAccept);
+        app.post("/offers/{id}/reject", CustomerController::handleReject);
+        app.post("/offers/{id}/message", CustomerController::handleMessage);
         app.get(Path.Web.USER_OFFERS, CustomerController::serveOffersPage);
+
+        app.get("/orderConfirmation", ctx -> ctx.render("orderConfirmation.html"));
     }
 
     public static void serveIndexPage(Context ctx) {
         User user = ctx.sessionAttribute("user");
 
-        // TODO: get possible dimensions from db
+        // TODO: get possible dimensions from DB
         int[] widths = new int[]{3000, 6000};//WoodMapper.getWood(Server.connectionPool, WoodCategory.RAFTERS, 0).toArray(new int[0]);
         int[] lengths = new int[]{3000, 6000};//WoodMapper.getWood(Server.connectionPool, WoodCategory.RAFTERS, 0).toArray(new int[0]);
         ctx.attribute("widths", widths);
@@ -34,8 +42,7 @@ public class CustomerController{
         ctx.sessionAttribute("successTxt", null);
     }
 
-    public static void handleFormPost(Context ctx)
-    {
+    public static void handleFormPost(Context ctx) {
         //TODO tilføj check af user ikke er null
 
         Offer offer;
@@ -58,39 +65,141 @@ public class CustomerController{
             if (text.length() >= 1024)
                 text = text.substring(0, 1024);
             int customerId = user.id;
-            offer = new Offer(0, customerId, adress, postalcode, carportWidth, height, carportLength, carportShedWidth, carportShedLength, text, OfferStatus.SALESPERSON);
+
+
+            //dummy data insert for testing customerPage
+            int salespersonId = 1;
+            String city = "København";
+            double price = 0.0;
+
+            offer = new Offer(0, customerId, salespersonId, adress, postalcode, city, carportWidth, height, carportLength, carportShedWidth, carportShedLength, price, text, OfferStatus.SALESPERSON);
             if (!OfferMapper.addQuery(Server.connectionPool, offer))
                 throw new Exception("addQuery failed");
-
+            //tester
             ctx.sessionAttribute("successTxt", "* Din forespørgsel er sendt!");
             ctx.redirect(Path.Web.INDEX);
         } catch (Exception e) {
-            System.out.println("ERROR: "+e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
             ctx.sessionAttribute("errmsg", "* Din forespørgsel kunne ikke sendes!");
             ctx.redirect(Path.Web.INDEX);
         }
-
     }
 
-    public static void serveOffersPage(Context ctx)
-    {
+//    public static void serveUserOffersPage(Context ctx)
+//    {
+//        try {
+//            User user = ctx.sessionAttribute("user");
+//            if (user == null) {
+//                ctx.sessionAttribute("loginredirect", Path.Web.USER_OFFERS);
+//                ctx.redirect(Path.Web.LOGIN);
+//                return;
+//            }
+//
+//            List<Offer> offers = OfferMapper.getCustomerOffers(Server.connectionPool, user.id);
+//
+//            ctx.attribute("user", user);
+//            ctx.attribute("offers", offers);
+//            ctx.render(Path.Template.USER_OFFERS);
+//        } catch (Exception e) {
+//            System.out.println("ERROR: " + e.getMessage());
+//            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
+        public static void serveOffersPage(Context ctx)
+        {
+            try {
+                User user = ctx.sessionAttribute("user");
+                if (user == null) {
+                    ctx.sessionAttribute("loginredirect", Path.Web.USER_OFFERS);
+                    ctx.redirect(Path.Web.LOGIN);
+                    return;
+                }
+
+                List<Offer> offers = OfferMapper.getCustomerOffers(Server.connectionPool, user.id);
+                System.out.println("User id: " + user.id + ", offers.size() = " + offers.size());
+
+                ctx.attribute("user", user);
+                ctx.attribute("offers", offers);
+                ctx.render(Path.Template.USER_OFFERS);
+            } catch (Exception e) {
+                System.out.println("ERROR: " + e.getMessage());
+                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+    public static void handleAccept(Context ctx) {
+        int id = Integer.parseInt(ctx.pathParam("id"));
+
         try {
-            User user = ctx.sessionAttribute("user");
-            if (user == null) {
-                ctx.sessionAttribute("loginredirect", Path.Web.USER_OFFERS);
-                ctx.redirect(Path.Web.LOGIN);
+            Offer offer = OfferMapper.getOffer(Server.connectionPool, id);
+            if (offer == null) {
+                ctx.status(404);
                 return;
             }
 
-            List<Offer> offers = OfferMapper.getCustomerOffers(Server.connectionPool, user.id);
+            offer.status = OfferStatus.ACCEPTED;
 
-            ctx.attribute("user", user);
-            ctx.attribute("offers", offers);
-            ctx.render(Path.Template.USER_OFFERS);
+            OfferMapper.updateOffer(Server.connectionPool, offer);
+
+            ctx.redirect(Path.Web.USER_OFFERS);
+
         } catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            System.out.println("ERROR (handleAccept): " + e.getMessage());
+            ctx.status(500);
+        }
+    }
+
+    public static void handleReject(Context ctx) {
+        int id = Integer.parseInt(ctx.pathParam("id"));
+
+        try {
+            Offer offer = OfferMapper.getOffer(Server.connectionPool, id);
+            if (offer == null) {
+                ctx.status(404);
+                return;
+            }
+
+            offer.status = OfferStatus.REJECTED;
+
+            OfferMapper.updateOffer(Server.connectionPool, offer);
+
+            ctx.redirect(Path.Web.USER_OFFERS);
+
+        } catch (Exception e) {
+            System.out.println("ERROR (handleReject): " + e.getMessage());
+            ctx.status(500);
+        }
+    }
+
+    public static void handleMessage(Context ctx) {
+        int id = Integer.parseInt(ctx.pathParam("id"));
+        String comment = ctx.formParam("comment");
+
+        try {
+            Offer offer = OfferMapper.getOffer(Server.connectionPool, id);
+            if (offer == null) {
+                ctx.status(404);
+                return;
+            }
+
+            // 1) Læg kommentaren et sted i Offer-objektet
+            // LIGE NU bruger vi "text"-feltet, da det allerede findes i DB
+            offer.text = comment;
+
+            // 2) Gem i databasen
+            OfferMapper.updateOffer(Server.connectionPool, offer);
+
+            // 3) Redirect tilbage til oversigten
+            ctx.redirect(Path.Web.USER_OFFERS);
+
+        } catch (Exception e) {
+            System.out.println("ERROR (handleMessage): " + e.getMessage());
+            ctx.status(500);
         }
     }
 
 }
+
+
+
+

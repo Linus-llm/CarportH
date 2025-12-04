@@ -1,7 +1,4 @@
-import app.db.ConnectionPool;
-import app.db.Offer;
-import app.db.OfferMapper;
-import app.db.OfferStatus;
+import app.db.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -58,6 +55,17 @@ public class TestDB {
         offers = OfferMapper.getCustomerOffers(cp, 1);
         assertNotNull(offers);
         assertFalse(offers.isEmpty());
+    }
+
+    @Test
+    public void testGetWood(){
+        try {
+            Wood wood = WoodMapper.getWood(cp, WoodCategory.PILLAR, 2000);
+            assertNotNull(wood);
+            System.out.println(wood.id+", "+wood.category+", "+wood.length+", "+wood.pricePerMeter);
+        } catch (SQLException e) {
+            fail(e);
+        }
     }
 
 }
