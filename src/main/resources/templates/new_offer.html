@@ -199,4 +199,31 @@
     }
     document.getElementById(defaultTab).click();
 </script>
+<form action="/sales/update-offer" method="post">
+    <input type="hidden" name="id" value="${offer.id}"/>
+
+    <label>Bredde (mm)</label>
+    <input type="number" name="width" value="${offer.width}" required/>
+
+    <label>Længde (mm)</label>
+    <input type="number" name="length" value="${offer.length}" required/>
+
+    <label>Højde (mm)</label>
+    <input type="number" name="height" value="${offer.height}" required/>
+
+    <label>Skur bredde (mm)</label>
+    <input type="number" name="shedWidth" value="${offer.shedWidth}" required/>
+
+    <label>Skur længde (mm)</label>
+    <input type="number" name="shedLength" value="${offer.shedLength}" required/>
+
+    <label>Pris (kr.)</label>
+    <input type="number" name="price" step="0.01" value="${offer.price}" required/>
+
+    <label>Kommentar til kunden</label>
+    <textarea name="text">${offer.text}</textarea>
+
+    <button type="submit">Gem ændringer</button>
+</form>
+
 </html>

@@ -1,11 +1,16 @@
-package app.web;
+package app.controllers;
 
-import app.db.*;
+import app.entities.Offer;
+import app.entities.OfferStatus;
+import app.entities.User;
+import app.entities.UserRole;
+import app.persistence.OfferMapper;
+import app.web.Path;
+import app.Server;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class CustomerController{

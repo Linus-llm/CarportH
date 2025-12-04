@@ -1,7 +1,14 @@
-package app.web;
+package app.controllers;
 
-import app.db.*;
 import app.draw.CarportSVG;
+import app.entities.Offer;
+import app.entities.OfferStatus;
+import app.entities.User;
+import app.entities.UserRole;
+import app.persistence.OfferMapper;
+import app.persistence.UserMapper;
+import app.web.Path;
+import app.Server;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HandlerType;
@@ -19,6 +26,7 @@ public class SalesController {
         app.post(Path.Web.SALES_CALC, SalesController::handleCalcPost);
         app.post(Path.Web.SALES_SEND_OFFER, SalesController::handleSendOfferPost);
         app.post("/sales/claim-offer/{id}", SalesController::handleClaimOffer);
+        app.post("/sales/update-offer", SalesController::handleUpdateOffer);
     }
 
     public static void before(Context ctx) {
@@ -162,6 +170,39 @@ public class SalesController {
             ctx.redirect(Path.Web.SALES);
         } catch (SQLException e) {
             e.printStackTrace();
+            //cxt.status(500) = Sætter serverens svar til en 500-fejl (intern serverfejl)
+            ctx.status(500);
+        }
+    }
+    public static void handleUpdateOffer(Context ctx) {
+        try {
+            int id = Integer.parseInt(ctx.formParam("id"));
+
+            Offer offer = OfferMapper.getOffer(Server.connectionPool, id);
+            if (offer == null) {
+                // ctx.status(404) = Sætter serverens svar til en 404-fejl (siden blev ikke fundet)
+                ctx.status(404);
+                return;
+            }
+
+            // opdatere tilbud
+            offer.width = Integer.parseInt(ctx.formParam("width"));
+            offer.length = Integer.parseInt(ctx.formParam("length"));
+            offer.height = Integer.parseInt(ctx.formParam("height"));
+            offer.shedWidth = Integer.parseInt(ctx.formParam("shedWidth"));
+            offer.shedLength = Integer.parseInt(ctx.formParam("shedLength"));
+            offer.price = Double.parseDouble(ctx.formParam("price"));
+            offer.text = ctx.formParam("text");
+            offer.status = OfferStatus.CUSTOMER;   // klar til kunde
+
+            // her bliver det gemt i databasen
+            OfferMapper.updateOffer(Server.connectionPool, offer);
+
+            ctx.sessionAttribute("defaultTab", "tab-dimensions");
+            ctx.redirect("/sales/new-offer/" + id);
+
+        } catch (Exception e) {
+            System.out.println("ERROR (handleUpdateOffer): " + e.getMessage());
             ctx.status(500);
         }
     }

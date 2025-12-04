@@ -1,5 +1,8 @@
-package app.web;
+package app;
 
+import app.controllers.CustomerController;
+import app.controllers.SalesController;
+import app.controllers.UserController;
 import io.javalin.Javalin;
 
 import java.sql.SQLException;
@@ -8,7 +11,7 @@ import io.javalin.rendering.template.JavalinThymeleaf;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
-import app.db.ConnectionPool;
+import app.persistence.ConnectionPool;
 
 public class Server {
 
@@ -16,7 +19,7 @@ public class Server {
     private static final String JDBC_PASSWORD = System.getenv("JDBC_PASSWORD");
     private static final String JDBC_URL = System.getenv("JDBC_URL");
     private static final String JDBC_DB = System.getenv("JDBC_DB");
-    static ConnectionPool connectionPool;
+    public static ConnectionPool connectionPool;
 
     public static void main(String[] args)
     {

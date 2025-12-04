@@ -1,7 +1,7 @@
-import app.db.ConnectionPool;
-import app.db.Offer;
-import app.db.OfferMapper;
-import app.db.OfferStatus;
+import app.persistence.ConnectionPool;
+import app.entities.Offer;
+import app.persistence.OfferMapper;
+import app.entities.OfferStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

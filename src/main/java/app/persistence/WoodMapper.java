@@ -1,4 +1,7 @@
-package app.db;
+package app.persistence;
+
+import app.entities.Wood;
+import app.entities.WoodCategory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

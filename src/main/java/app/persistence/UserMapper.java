@@ -1,5 +1,7 @@
-package app.db;
-import app.web.Server;
+package app.persistence;
+import app.entities.User;
+import app.entities.UserRole;
+
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.SecureRandom;
@@ -8,10 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.security.SecureRandom;
-import java.util.List;
 
 
 public class UserMapper {
