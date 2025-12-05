@@ -118,18 +118,22 @@ public class SalesController {
         String w = ctx.formParam("width");
         String l = ctx.formParam("length");
         String h = ctx.formParam("height");
-        if (w == null || l == null || h == null) {
+        String sw = ctx.formParam("shedWidth");
+        String sl = ctx.formParam("shedLength");
+
+        if (w == null || l == null || h == null || sw == null || sl == null) {
             ctx.status(HttpStatus.BAD_REQUEST);
             return;
         }
         offer.width = (int) (Float.parseFloat(w) * 1000);
         offer.length = (int) (Float.parseFloat(l) * 1000);
         offer.height = (int) (Float.parseFloat(h) * 1000);
-
+        offer.shedWidth = (int) (Float.parseFloat(sw) * 1000);
+        offer.shedLength = (int) (Float.parseFloat(sl) * 1000);
 
         // we calculate the needed wood pieces based on carport dimensions
         CarportCalculator calculator = new CarportCalculator();
-        List<WoodNeed> needs = calculator.calculateNeeds(offer.length, offer.width, offer.height);
+        List<WoodNeed> needs = calculator.calculateNeedsWithShed(Server.connectionPool, offer.length, offer.width, offer.height, offer.shedWidth, offer.shedLength );
 
         // we create bills list
         List<Bill> bills = new ArrayList<>();
@@ -154,8 +158,8 @@ public class SalesController {
                 // now we need to calculate the price for this line item
                 double pricePerMeter = wood.pricePerMeter;
                 //to get the length in meters we divide by 1000
-                double lengthMeters  = wood.length / 1000.0;
-                double linePrice     = pricePerMeter * lengthMeters * need.count;
+                double lengthMeters = wood.length / 1000.0;
+                double linePrice = pricePerMeter * lengthMeters * need.count;
                 // we then create a bill object for this line item
                 System.out.println("Creating bill for offerId = " + offer.id);
                 Bill bill = new Bill(
@@ -168,7 +172,7 @@ public class SalesController {
                 //we call the insert to save it to the DB
                 BillMapper.insert(Server.connectionPool, bill);
 
-                // then we add the line to the create bills list
+                // then we add the line to the created bills list
                 bills.add(bill);
             }
             // we calculate the total price of the bill by summing up each line price

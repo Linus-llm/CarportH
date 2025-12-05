@@ -23,7 +23,8 @@ INSERT INTO test.wood_profiles (category, width, height, price) VALUES
 (1, 97, 97, 45.95),
 -- BOARDS
 (2, 19, 100, 10.95),
-(2, 25, 200, 20.95);
+(2, 25, 200, 20.95),
+(3,19,100,8.95);
 
 INSERT INTO test.woods (profile_id, length) VALUES
 -- RAFTERS
@@ -41,7 +42,7 @@ INSERT INTO test.woods (profile_id, length) VALUES
 (2, 3600),
 (2, 4200),
 (2, 4800),
--- BOARDS
+-- BEAMS
 (3, 1800),
 (3, 2100),
 (3, 2400),
@@ -49,13 +50,23 @@ INSERT INTO test.woods (profile_id, length) VALUES
 (3, 3000),
 (3, 3600),
 (3, 4200),
+(3, 4800),
+(3, 5400),
+(3, 6000),
+(3, 6600),
 (4, 1800),
 (4, 2100),
 (4, 2400),
 (4, 2700),
 (4, 3000),
 (4, 3600),
-(4, 4200);
+(4, 4200),
+(4, 4800),
+(4, 5400),
+(4, 6000),
+(4, 6600),
+-- PLANKS
+(5, 2215);
 
 --INSERT INTO test.offers () VALUES
 --();

@@ -25,15 +25,21 @@ public class CustomerController{
         app.get("/orderConfirmation", ctx -> ctx.render("orderConfirmation.html"));
     }
 
-    public static void serveIndexPage(Context ctx) {
+    public static void serveIndexPage(Context ctx) throws SQLException {
         User user = ctx.sessionAttribute("user");
 
+
         // TODO: get possible dimensions from DB
-        int[] widths = new int[]{3000, 6000};//WoodMapper.getWood(Server.connectionPool, WoodCategory.RAFTERS, 0).toArray(new int[0]);
-        int[] lengths = new int[]{3000, 6000};//WoodMapper.getWood(Server.connectionPool, WoodCategory.RAFTERS, 0).toArray(new int[0]);
+        List<Wood> beams = WoodMapper.getWoodsByCategory(Server.connectionPool, WoodCategory.BEAM);
+
+        int[] lengths = beams.stream().mapToInt(w -> w.length).distinct().sorted().toArray();
+        int[] widths = beams.stream().mapToInt(w -> w.length).distinct().sorted().toArray();
         ctx.attribute("widths", widths);
         ctx.attribute("lengths", lengths);
-
+        int[] shedLengths = {1000, 1400, 1800, 2200, 2600, 3000, 3400, 3800, 4200, 4600, 5000};
+        ctx.attribute("shedLengths", shedLengths);
+        int[] shedWidths = widths;
+        ctx.attribute("shedWidths", shedWidths);
         ctx.attribute("user", user);
         ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
         ctx.attribute("successTxt", ctx.sessionAttribute("successTxt"));
@@ -54,8 +60,8 @@ public class CustomerController{
         try {
             int carportWidth = Integer.parseInt(ctx.formParam("carportWidth"));
             int carportLength = Integer.parseInt(ctx.formParam("carportLength"));
-            int carportShedWidth = 0;
-            int carportShedLength = 0;
+            int carportShedWidth = Integer.parseInt(ctx.formParam("carportShedWidth"));
+            int carportShedLength = Integer.parseInt(ctx.formParam("carportShedLength"));
             String adress = "address";
             int postalcode = 4242;
             int height = 2215; // default height
