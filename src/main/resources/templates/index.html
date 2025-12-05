@@ -78,10 +78,32 @@
             <div class="form-item">
                 <label class="form-label" for="carportLength">Carport længde <span class="field-required">*</span></label>
                 <select class="field" id="carportLength" name="carportLength">
-                    <option value="" disabled selected>Vælg længde</option>
+                    <option value="0" disabled selected>Vælg længde</option>
                     <th:block th:each="l:${lengths}">
                         <option th:value="${l}" th:text="${l}/10+'cm'"></option>
                     </th:block>
+                </select>
+            </div>
+            <div class="form-item">
+                <label class="form-label" for="carportShedLength">Carport skur længde </label>
+                <select class="field" id="carportShedLength" name="carportShedLength">
+                    <option value="0" selected>Vælg længde</option>
+
+                    <th:block th:each="l:${shedLengths}">
+                        <option th:value="${l}" th:text="${l}/10+'cm'"></option>
+                    </th:block>
+
+                </select>
+            </div>
+            <div class="form-item">
+                <label class="form-label" for="carportShedWidth">Carport skur bredde </label>
+                <select class="field" id="carportShedWidth" name="carportShedWidth">
+                    <option value="0" selected>Vælg Bredde</option>
+
+                    <th:block th:each="l:${shedWidths}">
+                        <option th:value="${l}" th:text="${l}/10+'cm'"></option>
+                    </th:block>
+
                 </select>
             </div>
             <div class="form-item">

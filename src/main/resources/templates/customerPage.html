@@ -31,7 +31,7 @@
     <strong>Tilbud fra sælger</strong>
     <span th:text="${offer.price}"></span>
     </p>
-
+<!-- TODO: hide after accept or deny press -->
     <div class="button-row">
     <form th:action="@{/offers/{id}/accept(id=${offer.id})}" method="post">
     <button type="submit" class="standard-blue-button">
