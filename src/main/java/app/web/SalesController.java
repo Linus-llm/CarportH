@@ -18,6 +18,7 @@ public class SalesController {
         app.get(Path.Web.SALES, SalesController::serveMainPage);
         app.get(Path.Web.SALES_NEW_OFFER, SalesController::serveNewOfferPage);
         app.post(Path.Web.SALES_CALC, SalesController::handleCalcPost);
+        app.post(Path.Web.SALES_SET_PRICE, SalesController::handleSetpricePost);
         app.post(Path.Web.SALES_SEND_OFFER, SalesController::handleSendOfferPost);
         app.post(Path.Web.SALES_CLAIM_OFFER, SalesController::handleClaimOfferPost);
     }
@@ -82,8 +83,6 @@ public class SalesController {
 
             // set as session attribute for form POST's
             ctx.sessionAttribute("offer", offer);
-            // TODO: List<Bill> bills = BillMapper.getBills(Server.connectionPool, offerId);
-            // ctx.attribute("bills", bills);
 
             List<Bill> bills = BillMapper.getBillsByOfferId(Server.connectionPool, offerId);
             ctx.attribute("bills", bills);
@@ -143,6 +142,8 @@ public class SalesController {
         // we create bills list
         List<Bill> bills = new ArrayList<>();
 
+        offer.price = 0;
+
         try {
             // we loop through each needed wood piece
             for (WoodNeed need : needs) {
@@ -179,26 +180,28 @@ public class SalesController {
 
                 // then we add the line to the create bills list
                 bills.add(bill);
+
+                // we calculate the total price of the bill by summing up each line price
+                offer.price += bill.price;
             }
-            // we calculate the total price of the bill by summing up each line price
-            double total = bills.stream().mapToDouble(b -> b.price).sum();
-            //we set the offer price to the total of the bill list
-            offer.price = total;
             //then we update the offer in the DB
-            OfferMapper.updatePrice(Server.connectionPool, offer.id, total);
+            OfferMapper.updatePrice(Server.connectionPool, offer.id, offer.price);
+
+            BillMapper.deleteOfferBills(Server.connectionPool, offer.id);
+            BillMapper.addBills(Server.connectionPool, bills);
 
         } catch(Exception e){
-                System.out.println("ERROR: " + e.getMessage());
-                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+            System.out.println("ERROR: " + e.getMessage());
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
 
-            path = Path.Web.SALES_NEW_OFFER;
-            idx = path.indexOf('{');
-            path = path.substring(0, idx);
-            path += offer.id;
-            ctx.sessionAttribute("defaultTab", "tab-matlist");
-            ctx.redirect(path);
+        path = Path.Web.SALES_NEW_OFFER;
+        idx = path.indexOf('{');
+        path = path.substring(0, idx);
+        path += offer.id;
+        ctx.sessionAttribute("defaultTab", "tab-matlist");
+        ctx.redirect(path);
 
     }
 
@@ -235,5 +238,33 @@ public class SalesController {
             System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public static void handleSetpricePost(Context ctx) {
+
+        Offer offer = ctx.sessionAttribute("offer");
+        String s = ctx.formParam("salesprice");
+        if (offer == null || s == null) {
+            ctx.status(HttpStatus.BAD_REQUEST);
+            return;
+        }
+        // FIXME: keep material price and sales price seperate
+        offer.price = Integer.parseInt(s);
+        try {
+            OfferMapper.updatePrice(Server.connectionPool, offer.id, offer.price);
+        } catch (SQLException e) {
+            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            return;
+        }
+        ctx.sessionAttribute("defaultTab", "tab-matlist");
+
+        String path;
+        int idx;
+        path = Path.Web.SALES_NEW_OFFER;
+        idx = path.indexOf('{');
+        path = path.substring(0, idx);
+        path += offer.id;
+        ctx.redirect(path);
     }
 }

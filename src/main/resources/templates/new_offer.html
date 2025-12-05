@@ -57,23 +57,46 @@
             border-top: 2px solid black;
             background-color: white;
         }
+        .frame-table {
+            position: relative;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+            color: black;
+            border: none;
+            width: fit-content;
+        }
         label {
             font-weight: bold;
             display: inline-block;
-            width: 6em;
+            width: 25%;
             cursor: text;
         }
         button {
             cursor: pointer;
         }
-        table, th, td {
-            border: 2px solid black;
+        table {
+            background-color: white;
+            border-spacing: 0;
+            border-left: 1px solid black
+            border-right: 1px solid black
+        }
+        th, td {
+            text-align: center;
+            border-spacing: 0;
+            border: 1px solid grey;
             padding-left: 1em;
             padding-right: 1em;
         }
         th {
+            position: sticky;
+            overflow-y: visible;
+            top: 0;
+            z-index: 1;
             color: black;
+            background-color: #efefef;
             font-weight: bold;
+            border: 2px solid black;
         }
         svg {
             background: white;
@@ -115,24 +138,42 @@
     <div id="matlist" class="tabcontent">
         <h2>Stykliste:</h2>
         <div class="frame-table">
-            <p>TODO: mat list and display price</p>
-            <div class="frame-text">
-                <table>
+            <table>
+                <tr>
+                    <th>Antal</th>
+                    <th>Nummer</th>
+                    <th>Beskrivelse</th>
+                    <th>Hjælpe Tekst</th>
+                    <th>Længde</th>
+                    <th>Bredde</th>
+                    <th>Højde</th>
+                </tr>
+                <th:block th:each="bill:${bills}">
                     <tr>
-                        <th>Beskrivelse</th>
-                        <th>Længde</th>
-                        <th>Antal</th>
+                        <td th:text="${bill.quantity}"></td>
+                        <td th:text="${bill.woodId}"></td>
+                        <td style="text-align: left" th:text="${bill.width + 'x' + bill.height + 'mm. ' + @app.web.Translator@translate(bill.category)}"></td>
+                        <td style="text-align: left" >TODO: helptext</td>
+                        <td th:text="${bill.length}"></td>
+                        <td th:text="${bill.width}"></td>
+                        <td th:text="${bill.height}"></td>
                     </tr>
-                     <th:block th:each="bill:${bills}">
-                        <tr>
-                            <td th:text="${bill.width + 'x' + bill.height + 'mm. ' + @app.web.Translator@translate(bill.category)}"></td>
-                            <td th:text="${bill.length}"></td>
-                            <td th:text="${bill.quantity}"></td>
-                        </tr>
-                     </th:block>
+                </th:block>
 
-                </table>
-            </div>
+            </table>
+        </div>
+        <div class="frame">
+            <h3>Pris og prisforslag</h3>
+            <label>Pris</label>
+            <span th:text="${offer.price}+' kr.'"></span>
+            <br>
+            <form method="POST" action="/sales/set-price">
+                <label for="salesprice">Prisforslag ved salg</label>
+                <input type="number" step="any" id="salesprice" name="salesprice" th:value="${offer.price}" placeholder="Salgspris">
+                <span>kr.</span>
+                <br>
+                <button type="submit">Sæt pris</button>
+            </form>
         </div>
     </div>
     <div id="customer" class="tabcontent">
@@ -164,6 +205,7 @@
         </div>
         <form method="POST" action="/sales/send-offer">
             <label for="text">Evt. bemærkning</label>
+            <br>
             <textarea id="text" name="text"></textarea>
             <button type="submit">Send tilbud</button>
         </form>
