@@ -165,7 +165,7 @@ public class CustomerController{
                 return;
             }
 
-            offer.status = OfferStatus.REJECTED;
+            offer.status = OfferStatus.SALESPERSON;
 
             OfferMapper.updateOffer(Server.connectionPool, offer);
 

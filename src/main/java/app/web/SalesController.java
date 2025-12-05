@@ -207,6 +207,9 @@ public class SalesController {
         }
         try {
             offer.text = ctx.formParam("text");
+            String price = ctx.formParam("price");
+            if(price != null && !price.isEmpty()){
+            offer.price = (int) Double.parseDouble(price);}
             offer.status = OfferStatus.CUSTOMER;
             OfferMapper.updateOffer(Server.connectionPool, offer);
         } catch (SQLException e) {

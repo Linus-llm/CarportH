@@ -168,7 +168,18 @@
                 <span>------------------------------------</span><br>
             </div>
         </div>
+
         <form method="POST" action="/sales/send-offer">
+            <div class="frame">
+                <h3>Tilbudspris</h3>
+                <label for="price">Ny pris:</label>
+                <input type="number"
+                       id="price"
+                       name="price"
+                       step="0.01"
+                       min="0"
+                       th:value="${offer.price}">
+            </div>
             <label for="text">Evt. bemærkning</label>
             <textarea id="text" name="text"></textarea>
             <button type="submit">Send tilbud</button>
