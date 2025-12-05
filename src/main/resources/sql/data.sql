@@ -1,11 +1,11 @@
 BEGIN;
 
-DELETE FROM public.users;
-DELETE FROM public.wood_profiles;
-DELETE FROM public.woods;
-DELETE FROM public.offers;
-DELETE FROM public.postalcodes;
 DELETE FROM public.bills;
+DELETE FROM public.offers;
+DELETE FROM public.woods;
+DELETE FROM public.wood_profiles;
+DELETE FROM public.users;
+DELETE FROM public.postalcodes;
 
 ALTER SEQUENCE users_id_seq RESTART;
 UPDATE users SET id = DEFAULT;
@@ -13,6 +13,8 @@ ALTER SEQUENCE wood_profiles_id_seq RESTART;
 UPDATE wood_profiles SET id = DEFAULT;
 ALTER SEQUENCE woods_id_seq RESTART;
 UPDATE woods SET id = DEFAULT;
+ALTER SEQUENCE offers_id_seq RESTART;
+UPDATE offers SET id = DEFAULT;
 
 INSERT INTO public.users (name, email, password, salt, role) VALUES
 ('ole', 'ole@customer.dk', decode('DEADBEAF', 'hex'), decode('DEADBEAF', 'hex'), 0),

@@ -185,7 +185,7 @@ public class SalesController {
                 offer.price += bill.price;
             }
             //then we update the offer in the DB
-            OfferMapper.updatePrice(Server.connectionPool, offer.id, offer.price);
+            OfferMapper.updateOffer(Server.connectionPool, offer);
 
             BillMapper.deleteOfferBills(Server.connectionPool, offer.id);
             BillMapper.addBills(Server.connectionPool, bills);
