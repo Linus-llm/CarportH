@@ -32,6 +32,11 @@
     <span th:text="${offer.price}"></span>
     </p>
 <!-- TODO: hide after accept or deny press -->
+    <div th:if="${offer.status.name() == 'SALESPERSON'}">
+        <p><em>Tilbuddet er i gang med at blive behandlet af en sælger</em></p>
+
+    </div>
+    <div th:unless="${offer.status.name() == 'SALESPERSON'}">
     <div class="button-row">
     <form th:action="@{/offers/{id}/accept(id=${offer.id})}" method="post">
     <button type="submit" class="standard-blue-button">
@@ -62,7 +67,7 @@
             Send melding
         </button>
     </form>
-
+    </div>
 </section>
 </div>
 </div>
