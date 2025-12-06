@@ -28,6 +28,16 @@
       <button class="header-menu-button-SælgerView" type="button">SælgerView</button>
     </a>
   </div>
+  <div class="header-menu-item">
+    <a href="/">
+      <button class="header-menu-button-index" type="button">Forside</button>
+    </a>
+  </div>
+  <div th:if="${user != null}" class="header-menu-item">
+    <a href="/logout">
+      <button class="header-menu-button-logout" type="button">Log ud</button>
+    </a>
+  </div>
 
 </div>
 

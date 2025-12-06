@@ -23,9 +23,11 @@ INSERT INTO public.wood_profiles (category, width, height, price) VALUES
 (0, 47, 195, 52.95),
 -- PILLARS
 (1, 97, 97, 45.95),
--- BOARDS
+-- BEAMS
 (2, 19, 100, 10.95),
 (2, 25, 200, 20.95);
+-- PLANKS
+(3,19,100,8.95);
 
 INSERT INTO public.woods (profile_id, length) VALUES
 -- RAFTERS
@@ -43,7 +45,7 @@ INSERT INTO public.woods (profile_id, length) VALUES
 (2, 3600),
 (2, 4200),
 (2, 4800),
--- BOARDS
+-- BEAMS
 (3, 1800),
 (3, 2100),
 (3, 2400),
@@ -51,13 +53,19 @@ INSERT INTO public.woods (profile_id, length) VALUES
 (3, 3000),
 (3, 3600),
 (3, 4200),
+(3, 4800),
+(3, 5400),
+(3, 6000),
 (4, 1800),
 (4, 2100),
 (4, 2400),
 (4, 2700),
 (4, 3000),
 (4, 3600),
-(4, 4200);
+(4, 4200),
+(4, 4800),
+(4, 5400),
+(4, 6000);
 
 --INSERT INTO public.offers () VALUES
 --();

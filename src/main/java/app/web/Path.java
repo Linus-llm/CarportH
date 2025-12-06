@@ -12,6 +12,7 @@ public class Path {
         public static final String REGISTER ="/register";
         public static final String SEND_REQUEST ="/SendRequest";
         public static final String USER_OFFERS = "/customer/offers";
+        public static final String LOGOUT = "/logout";
     }
 
     public static class Template {

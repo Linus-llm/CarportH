@@ -19,6 +19,7 @@ public class UserController {
         app.get(Path.Web.LOGIN, UserController::serveLoginPage);
         app.post(Path.Web.LOGIN, UserController::handleLoginPost);
         app.post(Path.Web.REGISTER, UserController::handleRegisterPost);
+        app.post(Path.Web.LOGOUT, UserController::handleLogoutPost);
 
     }
     public static void serveLoginPage(Context ctx)
@@ -55,6 +56,12 @@ public class UserController {
             ctx.redirect(redirect);
             return;
         }
+        ctx.redirect(Path.Web.INDEX);
+    }
+
+    public static void handleLogoutPost(Context ctx)
+    {
+        ctx.sessionAttribute("user", null);
         ctx.redirect(Path.Web.INDEX);
     }
 
