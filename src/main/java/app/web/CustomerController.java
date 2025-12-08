@@ -62,12 +62,12 @@ public class CustomerController{
             int carportLength = Integer.parseInt(ctx.formParam("carportLength"));
             int carportShedWidth = Integer.parseInt(ctx.formParam("carportShedWidth"));
             int carportShedLength = Integer.parseInt(ctx.formParam("carportShedLength"));
-            String adress = "address";
-            int postalcode = 4242;
+            String adress = ctx.formParam("address");
+            int postalcode = Integer.parseInt(ctx.formParam("postalCodes"));
             int height = 2215; // default height
             String text = ctx.formParam("text");
             if (text == null)
-                text = "";
+                text = "t";
             if (text.length() >= 1024)
                 text = text.substring(0, 1024);
             int customerId = user.id;
