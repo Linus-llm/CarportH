@@ -168,22 +168,26 @@
                         <td th:text="${bill.height}"></td>
                     </tr>
                 </th:block>
-
             </table>
         </div>
+        <br>
         <div class="frame">
-            <h3>Pris og prisforlag</h3>
-            <label>Pris</label>
-            <span th:text="${@app.web.Translator@currency(costprice)}"></span>
+            <h3>Pris og prisforslag</h3>
+            <label>Salgspris</label>
+            <span th:text="${@app.web.Translator@currency(offer.price)}+' kr.'"></span>
+            <br>
+            <label>Samlet kostpris</label>
+            <span th:text="${@app.web.Translator@currency(costprice)}+' kr.'"></span>
+            <br><br>
+            <label>Dækningsgrad</label>
+            <span th:if="${offer.price!=0}" th:text="${@app.web.Translator@currency(((offer.price-costprice)/offer.price)*100)}"></span>
+            <br><br>
             <form method="post" action="/sales/set-price">
-                <label for="salesprice">Salgs pris:</label>
+                <label for="salesprice">Prisforslag:</label>
                 <input id="salesprice" name="salesprice" type="text" step="0.01" th:value="${@app.web.Translator@currency(offer.price)}">
                 <span>kr.</span>
                 <button type="submit">Sæt pris</button>
             </form>
-            <label>Dækningsgrad</label>
-            <span th:if="${offer.price!=0}" th:text="${@app.web.Translator@currency((offer.price-costprice)/offer.price)}"></span>
-            <span th:if="${offer.price==0}" th:text="${@app.web.Translator@currency(costprice)}"></span>
         </div>
     </div>
     <div id="customer" class="tabcontent">

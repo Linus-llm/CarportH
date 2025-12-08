@@ -11,8 +11,12 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class SalesController {
+
+    private static Logger logger = Logger.getLogger("web");
 
     public static void addRoutes(Javalin app) {
         app.before(Path.Web.SALES + "*", SalesController::before);
@@ -61,7 +65,7 @@ public class SalesController {
 
             ctx.render(Path.Template.SALES);
         } catch (Exception e) {
-            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -114,7 +118,7 @@ public class SalesController {
             ctx.render(Path.Template.SALES_NEW_OFFER);
             ctx.sessionAttribute("errmsg", null);
         } catch (Exception e) {
-            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -180,7 +184,6 @@ public class SalesController {
                 double lengthMeters = wood.length / 1000.0;
                 double linePrice = pricePerMeter * lengthMeters * need.count;
                 // we then create a bill object for this line item
-                System.out.println("Creating bill for offerId = " + offer.id);
                 Bill bill = new Bill(
                         offer.id,
                         wood.id,
@@ -188,7 +191,6 @@ public class SalesController {
                         "helptext.todo",
                         linePrice
                 );
-                System.out.println("Bill.offerId = " + bill.offerId);
                 //we call the insert to save it to the DB
                 BillMapper.insert(Server.connectionPool, bill);
 
@@ -205,7 +207,7 @@ public class SalesController {
             BillMapper.addBills(Server.connectionPool, bills);
 
         } catch(Exception e){
-            System.out.println("ERROR: " + e.getMessage());
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": " + e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -229,7 +231,7 @@ public class SalesController {
             offer.status = OfferStatus.CUSTOMER;
             OfferMapper.updateOffer(Server.connectionPool, offer);
         } catch (SQLException e) {
-            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             return;
         }
@@ -246,7 +248,7 @@ public class SalesController {
             OfferMapper.assignSalesperson(Server.connectionPool, offerId, user.id);
             ctx.redirect(Path.Web.SALES);
         } catch (SQLException e) {
-            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -259,7 +261,6 @@ public class SalesController {
             ctx.status(HttpStatus.BAD_REQUEST);
             return;
         }
-        // FIXME: keep material price and sales price seperate
         ctx.sessionAttribute("defaultTab", "tab-matlist");
         try {
             offer.price = Translator.parseCurrency(s);
@@ -269,7 +270,7 @@ public class SalesController {
             ctx.redirect(Path.Web.SALES_NEW_OFFER+offer.id);
             return;
         } catch (SQLException e) {
-            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             return;
         }
