@@ -120,6 +120,7 @@ public class SalesController {
         int idx;
         Offer offer;
 
+
         offer = ctx.sessionAttribute("offer");
         if (offer == null) {
             ctx.status(HttpStatus.BAD_REQUEST);
@@ -142,74 +143,7 @@ public class SalesController {
         offer.shedWidth = (int) (Float.parseFloat(sw) * 1000);
         offer.shedLength = (int) (Float.parseFloat(sl) * 1000);
 
-        // we calculate the needed wood pieces based on carport dimensions
-        CarportCalculator calculator = new CarportCalculator();
-        List<WoodNeed> needs = calculator.calculateNeedsWithShed(Server.connectionPool, offer.length, offer.width, offer.height, offer.shedWidth, offer.shedLength );
-        if (needs == null) {
-            ctx.sessionAttribute("errmsg", "* failed to build carport");
-            path = Path.Web.SALES_NEW_OFFER;
-            idx = path.indexOf('{');
-            path = path.substring(0, idx);
-            path += offer.id;
-            ctx.redirect(path);
-            return;
-        }
-        // we create bills list
-        List<Bill> bills = new ArrayList<>();
-
-        offer.price = 0;
-
-        try {
-            // we loop through each needed wood piece
-            for (WoodNeed need : needs) {
-
-                Wood wood = null;
-                // thus we find a suitable wood piece from the DB with getWood
-                try {
-                    wood = WoodMapper.getWood(Server.connectionPool, need.type, need.requiredLengthMm);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-                if (wood == null) {
-                    // TODO: no suitable wood found, handle this case
-                    continue;
-                }
-
-                // now we have found our wood piece
-                // now we need to calculate the price for this line item
-                double pricePerMeter = wood.pricePerMeter;
-                //to get the length in meters we divide by 1000
-                double lengthMeters = wood.length / 1000.0;
-                double linePrice = pricePerMeter * lengthMeters * need.count;
-                // we then create a bill object for this line item
-                System.out.println("Creating bill for offerId = " + offer.id);
-                Bill bill = new Bill(
-                        offer.id,
-                        wood.id,
-                        need.count,
-                        linePrice
-                );
-                System.out.println("Bill.offerId = " + bill.offerId);
-                //we call the insert to save it to the DB
-                BillMapper.insert(Server.connectionPool, bill);
-
-                // then we add the line to the created bills list
-                bills.add(bill);
-
-                // we calculate the total price of the bill by summing up each line price
-                offer.price += bill.price;
-            }
-            //then we update the offer in the DB
-            OfferMapper.updateOffer(Server.connectionPool, offer);
-
-            BillMapper.deleteOfferBills(Server.connectionPool, offer.id);
-            BillMapper.addBills(Server.connectionPool, bills);
-
-        } catch(Exception e){
-            System.out.println("ERROR: " + e.getMessage());
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
+        CarportCalculator.calculateOffer(Server.connectionPool,offer, offer.width, offer.length, offer.height, offer.shedWidth, offer.shedLength);
 
         path = Path.Web.SALES_NEW_OFFER;
         idx = path.indexOf('{');
