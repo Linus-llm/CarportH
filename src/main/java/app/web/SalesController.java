@@ -20,6 +20,7 @@ public class SalesController {
         app.post(Path.Web.SALES_CALC, SalesController::handleCalcPost);
         app.post(Path.Web.SALES_SEND_OFFER, SalesController::handleSendOfferPost);
         app.post("/sales/claim-offer/{id}", SalesController::handleClaimOffer);
+        app.post("/sales/update-price/{id}", SalesController::handleUpdatePrice);
     }
 
     public static void before(Context ctx) {
@@ -225,6 +226,32 @@ public class SalesController {
             ctx.redirect(Path.Web.SALES);
         } catch (SQLException e) {
             e.printStackTrace();
+            ctx.status(500);
+        }
+    }
+    public static void handleUpdatePrice(Context ctx) {
+        User user = ctx.sessionAttribute("user");
+
+
+        if (user == null || user.role != UserRole.SALESPERSON) {
+            ctx.status(403);
+            return;
+        }
+
+        int offerId = Integer.parseInt(ctx.pathParam("id"));
+        String priceStr = ctx.formParam("price");
+
+        try {
+            double price = Double.parseDouble(priceStr);
+
+
+            OfferMapper.updatePrice(Server.connectionPool, offerId, price);
+
+
+            ctx.redirect("/sales/new-offer/" + offerId);
+
+        } catch (Exception e) {
+            System.out.println("ERROR (handleUpdatePrice): " + e.getMessage());
             ctx.status(500);
         }
     }
