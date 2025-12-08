@@ -57,23 +57,46 @@
             border-top: 2px solid black;
             background-color: white;
         }
+        .frame-table {
+            position: relative;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+            color: black;
+            border: none;
+            width: fit-content;
+        }
         label {
             font-weight: bold;
             display: inline-block;
-            width: 6em;
+            width: 25%;
             cursor: text;
         }
         button {
             cursor: pointer;
         }
-        table, th, td {
-            border: 2px solid black;
+        table {
+            background-color: white;
+            border-spacing: 0;
+            border-left: 1px solid black
+            border-right: 1px solid black
+        }
+        th, td {
+            text-align: center;
+            border-spacing: 0;
+            border: 1px solid grey;
             padding-left: 1em;
             padding-right: 1em;
         }
         th {
+            position: sticky;
+            overflow-y: visible;
+            top: 0;
+            z-index: 1;
             color: black;
+            background-color: #efefef;
             font-weight: bold;
+            border: 2px solid black;
         }
         svg {
             background: white;
@@ -86,9 +109,9 @@
         <a id="tab-matlist" class="tablink tab-button" onclick="openTab(event, 'matlist')">Stykliste</a>
         <a class="tablink tab-button" onclick="openTab(event, 'customer')">Kunde</a>
         <a class="tablink tab-button" onclick="openTab(event, 'drawing')">Tegning</a>
-        <a class="tablink tab-button" onclick="openTab(event, 'offer')">Tilbud</a>
+        <a id="tab-offer" class="tablink tab-button" onclick="openTab(event, 'offer')">Tilbud</a>
     </div>
-
+    <p class="alert-error" th:if="${errmsg}!=null" th:text="${errmsg}"></p>
     <div id="dimensions" class="tabcontent">
         <form method="POST" action="/sales/calc">
             <div class="frame">
@@ -121,24 +144,29 @@
     <div id="matlist" class="tabcontent">
         <h2>Stykliste:</h2>
         <div class="frame-table">
-            <p>TODO: mat list and display price</p>
-            <div class="frame-text">
-                <table>
+            <table>
+                <tr>
+                    <th>Antal</th>
+                    <th>Nummer</th>
+                    <th>Beskrivelse</th>
+                    <th>Hjælpe Tekst</th>
+                    <th>Længde</th>
+                    <th>Bredde</th>
+                    <th>Højde</th>
+                </tr>
+                <th:block th:each="bill:${bills}">
                     <tr>
-                        <th>Beskrivelse</th>
-                        <th>Længde</th>
-                        <th>Antal</th>
+                        <td th:text="${bill.quantity}"></td>
+                        <td th:text="${bill.woodId}"></td>
+                        <td style="text-align: left" th:text="${bill.width + 'x' + bill.height + 'mm. ' + @app.web.Translator@translate(bill.category)}"></td>
+                        <td style="text-align: left" >TODO: helptext</td>
+                        <td th:text="${bill.length}"></td>
+                        <td th:text="${bill.width}"></td>
+                        <td th:text="${bill.height}"></td>
                     </tr>
-                     <th:block th:each="bill:${bills}">
-                        <tr>
-                            <td th:text="${bill.width + 'x' + bill.height + 'mm. ' + @app.web.Translator@translate(bill.category)}"></td>
-                            <td th:text="${bill.length}"></td>
-                            <td th:text="${bill.quantity}"></td>
-                        </tr>
-                     </th:block>
+                </th:block>
 
-                </table>
-            </div>
+            </table>
         </div>
     </div>
     <div id="customer" class="tabcontent">
@@ -164,30 +192,20 @@
                 <span>------------------------------------</span><br>
                 <span th:text="'Carport '+${offer.width}/1000+' x '+${offer.length}/1000+' mtr.'"></span><br>
                 <span>------------------------------------</span><br>
-                <span th:text="'Salgspris: '+${offer.price}+' kr'"></span><br>
+                <span th:text="'Salgspris: '+${@app.web.Translator@currency(offer.price)}+' kr'"></span><br>
                 <span>------------------------------------</span><br>
             </div>
         </div>
         <h3>Ret pris</h3>
-        <form method="post" th:action="@{'/sales/update-price/' + ${offer.id}}">
-            <label for="price">Pris (kr):</label>
-            <input id="price" name="price" type="number" step="0.01" th:value="${offer.price}">
+        <form method="post" action="/sales/set-price">
+            <label for="salesprice">Pris (kr):</label>
+            <input id="salesprice" name="salesprice" type="text" step="0.01" th:value="${@app.web.Translator@currency(offer.price)}">
             <button type="submit">Opdater pris</button>
         </form>
-
         <br><hr><br>
         <form method="POST" action="/sales/send-offer">
-            <div class="frame">
-                <h3>Tilbudspris</h3>
-                <label for="price">Ny pris:</label>
-                <input type="number"
-                       id="price"
-                       name="price"
-                       step="0.01"
-                       min="0"
-                       th:value="${offer.price}">
-            </div>
             <label for="text">Evt. bemærkning</label>
+            <br>
             <textarea id="text" name="text"></textarea>
             <button type="submit">Send tilbud</button>
         </form>

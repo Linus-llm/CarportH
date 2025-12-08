@@ -59,4 +59,44 @@ public class BillMapper {
         }
         return result;
     }
+
+    public static boolean addBills(ConnectionPool cp, List<Bill> bills)
+    {
+        String sql = "INSERT INTO bills (offer_id, wood_id, count, price) VALUES (?, ?, ?, ?)";
+
+        try (Connection conn = cp.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            conn.setAutoCommit(false);
+            for (Bill b : bills) {
+                ps.setInt(1, b.offerId);
+                ps.setInt(2, b.woodId);
+                ps.setInt(3, b.quantity);
+                ps.setDouble(4, b.price);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+            conn.commit();
+            conn.setAutoCommit(true);
+            return true;
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+
+        return false;
+    }
+
+    public static boolean deleteOfferBills(ConnectionPool cp, int offerId)
+    {
+        String sql = "DELETE FROM bills WHERE offer_id=?";
+
+        try (Connection conn = cp.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, offerId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+
+        return false;
+    }
 }

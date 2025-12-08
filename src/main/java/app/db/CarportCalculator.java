@@ -57,6 +57,9 @@ public class CarportCalculator {
         catch(Exception e){
             System.out.println("ERROR: " + e.getMessage());
         }
+        if (wood == null) {
+            return null;
+        }
         int beamCountWidth = calcNumberOfBeamsCoverWidth(widthMm, wood.length);
         needs.add(new WoodNeed(WoodCategory.BEAM, widthMm, beamCountWidth));
         //length
@@ -64,6 +67,9 @@ public class CarportCalculator {
             wood = WoodMapper.getWood(cp, WoodCategory.BEAM, lengthMm);}
         catch(Exception e){
             System.out.println("ERROR: " + e.getMessage());
+        }
+        if (wood == null) {
+            return null;
         }
         int beamCountLength = calcNumberOfBeamsForRemLength(widthMm, wood.length);
         needs.add(new WoodNeed(WoodCategory.BEAM, widthMm, beamCountLength));

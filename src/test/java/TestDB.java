@@ -1,7 +1,4 @@
-import app.db.ConnectionPool;
-import app.db.Offer;
-import app.db.OfferMapper;
-import app.db.OfferStatus;
+import app.db.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
