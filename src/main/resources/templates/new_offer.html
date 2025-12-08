@@ -162,7 +162,7 @@
                         <td th:text="${bill.quantity}"></td>
                         <td th:text="${bill.woodId}"></td>
                         <td style="text-align: left" th:text="${bill.width + 'x' + bill.height + 'mm. ' + @app.web.Translator@translate(bill.category)}"></td>
-                        <td style="text-align: left" th:text="${bill.helptext}"></td>
+                        <td style="text-align: left" th:text="${@app.web.Translator@translate(bill.helptext)}"></td>
                         <td th:text="${bill.length}"></td>
                         <td th:text="${bill.width}"></td>
                         <td th:text="${bill.height}"></td>
@@ -170,6 +170,20 @@
                 </th:block>
 
             </table>
+        </div>
+        <div class="frame">
+            <h3>Pris og prisforlag</h3>
+            <label>Pris</label>
+            <span th:text="${@app.web.Translator@currency(costprice)}"></span>
+            <form method="post" action="/sales/set-price">
+                <label for="salesprice">Salgs pris:</label>
+                <input id="salesprice" name="salesprice" type="text" step="0.01" th:value="${@app.web.Translator@currency(offer.price)}">
+                <span>kr.</span>
+                <button type="submit">Sæt pris</button>
+            </form>
+            <label>Dækningsgrad</label>
+            <span th:if="${offer.price!=0}" th:text="${@app.web.Translator@currency((offer.price-costprice)/offer.price)}"></span>
+            <span th:if="${offer.price==0}" th:text="${@app.web.Translator@currency(costprice)}"></span>
         </div>
     </div>
     <div id="customer" class="tabcontent">
@@ -199,12 +213,6 @@
                 <span>------------------------------------</span><br>
             </div>
         </div>
-        <h3>Ret pris</h3>
-        <form method="post" action="/sales/set-price">
-            <label for="salesprice">Pris (kr):</label>
-            <input id="salesprice" name="salesprice" type="text" step="0.01" th:value="${@app.web.Translator@currency(offer.price)}">
-            <button type="submit">Opdater pris</button>
-        </form>
         <br><hr><br>
         <form method="POST" action="/sales/send-offer">
             <label for="text">Evt. bemærkning</label>

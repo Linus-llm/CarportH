@@ -87,11 +87,15 @@ public class SalesController {
 
             List<Bill> bills = BillMapper.getBillsByOfferId(Server.connectionPool, offerId);
             ctx.attribute("bills", bills);
+            double costprice = 0.0;
+            for (Bill b : bills)
+                costprice += b.price;
 
             User customer = UserMapper.getUser(Server.connectionPool, offer.customerId);
             ctx.attribute("customer", customer);
 
             ctx.attribute("offer", offer);
+            ctx.attribute("costprice", costprice);
 
             String defaultTab = ctx.sessionAttribute("defaultTab");
             if (defaultTab == null)
@@ -181,7 +185,7 @@ public class SalesController {
                         offer.id,
                         wood.id,
                         need.count,
-                        "TODO: helptext",
+                        "helptext.todo",
                         linePrice
                 );
                 System.out.println("Bill.offerId = " + bill.offerId);
@@ -256,7 +260,7 @@ public class SalesController {
             return;
         }
         // FIXME: keep material price and sales price seperate
-        ctx.sessionAttribute("defaultTab", "tab-offer");
+        ctx.sessionAttribute("defaultTab", "tab-matlist");
         try {
             offer.price = Translator.parseCurrency(s);
             OfferMapper.updatePrice(Server.connectionPool, offer.id, offer.price);
