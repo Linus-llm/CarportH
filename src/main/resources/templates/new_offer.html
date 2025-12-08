@@ -168,7 +168,14 @@
                 <span>------------------------------------</span><br>
             </div>
         </div>
+        <h3>Ret pris</h3>
+        <form method="post" th:action="@{'/sales/update-price/' + ${offer.id}}">
+            <label for="price">Pris (kr):</label>
+            <input id="price" name="price" type="number" step="0.01" th:value="${offer.price}">
+            <button type="submit">Opdater pris</button>
+        </form>
 
+        <br><hr><br>
         <form method="POST" action="/sales/send-offer">
             <div class="frame">
                 <h3>Tilbudspris</h3>
