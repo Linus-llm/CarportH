@@ -17,7 +17,7 @@ public class SalesController {
     public static void addRoutes(Javalin app) {
         app.before(Path.Web.SALES + "*", SalesController::before);
         app.get(Path.Web.SALES, SalesController::serveMainPage);
-        app.get(Path.Web.SALES_NEW_OFFER, SalesController::serveNewOfferPage);
+        app.get(Path.Web.SALES_NEW_OFFER+"{id}", SalesController::serveNewOfferPage);
         app.post(Path.Web.SALES_CALC, SalesController::handleCalcPost);
         app.post(Path.Web.SALES_SEND_OFFER, SalesController::handleSendOfferPost);
         app.post(Path.Web.SALES_CLAIM_OFFER, SalesController::handleClaimOfferPost);
@@ -116,8 +116,6 @@ public class SalesController {
     }
 
     public static void handleCalcPost(Context ctx) {
-        String path;
-        int idx;
         Offer offer;
 
         offer = ctx.sessionAttribute("offer");
@@ -147,11 +145,7 @@ public class SalesController {
         List<WoodNeed> needs = calculator.calculateNeedsWithShed(Server.connectionPool, offer.length, offer.width, offer.height, offer.shedWidth, offer.shedLength );
         if (needs == null) {
             ctx.sessionAttribute("errmsg", "* failed to build carport");
-            path = Path.Web.SALES_NEW_OFFER;
-            idx = path.indexOf('{');
-            path = path.substring(0, idx);
-            path += offer.id;
-            ctx.redirect(path);
+            ctx.redirect(Path.Web.SALES_NEW_OFFER+offer.id);
             return;
         }
         // we create bills list
@@ -211,14 +205,8 @@ public class SalesController {
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-
-        path = Path.Web.SALES_NEW_OFFER;
-        idx = path.indexOf('{');
-        path = path.substring(0, idx);
-        path += offer.id;
         ctx.sessionAttribute("defaultTab", "tab-matlist");
-        ctx.redirect(path);
-
+        ctx.redirect(Path.Web.SALES_NEW_OFFER+offer.id);
     }
 
     public static void handleSendOfferPost(Context ctx) {
@@ -268,26 +256,20 @@ public class SalesController {
             return;
         }
         // FIXME: keep material price and sales price seperate
+        ctx.sessionAttribute("defaultTab", "tab-offer");
         try {
             offer.price = Translator.parseCurrency(s);
             OfferMapper.updatePrice(Server.connectionPool, offer.id, offer.price);
         } catch (ParseException e) {
-            ctx.sessionAttribute("errmsg", "failed to set price");
-            ctx.redirect(Path.Web.SALES_NEW_OFFER);
+            ctx.sessionAttribute("errmsg", "* failed to set price");
+            ctx.redirect(Path.Web.SALES_NEW_OFFER+offer.id);
             return;
         } catch (SQLException e) {
             System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             return;
         }
-        ctx.sessionAttribute("defaultTab", "tab-offer");
 
-        String path;
-        int idx;
-        path = Path.Web.SALES_NEW_OFFER;
-        idx = path.indexOf('{');
-        path = path.substring(0, idx);
-        path += offer.id;
-        ctx.redirect(path);
+        ctx.redirect(Path.Web.SALES_NEW_OFFER+offer.id);
     }
 }

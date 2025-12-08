@@ -101,6 +101,9 @@
         svg {
             background: white;
         }
+        .error {
+            color: red
+        }
     </style>
 </head>
 <body>
@@ -111,7 +114,7 @@
         <a class="tablink tab-button" onclick="openTab(event, 'drawing')">Tegning</a>
         <a id="tab-offer" class="tablink tab-button" onclick="openTab(event, 'offer')">Tilbud</a>
     </div>
-    <p class="alert-error" th:if="${errmsg}!=null" th:text="${errmsg}"></p>
+    <p class="error" th:if="${errmsg}!=null" th:text="${errmsg}"></p>
     <div id="dimensions" class="tabcontent">
         <form method="POST" action="/sales/calc">
             <div class="frame">

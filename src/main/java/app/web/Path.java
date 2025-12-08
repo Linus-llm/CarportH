@@ -6,7 +6,7 @@ public class Path {
         public static final String INDEX = "/";
         public static final String LOGIN = "/login";
         public static final String SALES = "/sales";
-        public static final String SALES_NEW_OFFER = "/sales/new-offer/{id}";
+        public static final String SALES_NEW_OFFER = "/sales/new-offer/";//+{id}
         public static final String SALES_SEND_OFFER = "/sales/send-offer";
         public static final String SALES_SET_PRICE = "/sales/set-price";
         public static final String SALES_CALC = "/sales/calc";
