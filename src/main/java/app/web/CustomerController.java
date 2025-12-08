@@ -16,8 +16,7 @@ public class CustomerController{
         app.post(Path.Web.SEND_REQUEST, CustomerController::handleFormPost);
 
 //      app.get(Path.Web.USER_OFFERS, CustomerController::serveUserOffersPage);
-
-        app.post("/offers/{id}/accept", CustomerController::handleAccept);
+        app.post(Path.Web.ACCEPT_OFFER, CustomerController::handleAccept);
         app.post("/offers/{id}/reject", CustomerController::handleReject);
         app.post("/offers/{id}/message", CustomerController::handleMessage);
         app.get(Path.Web.USER_OFFERS, CustomerController::serveOffersPage);
@@ -147,12 +146,18 @@ public class CustomerController{
 
             OfferMapper.updateOffer(Server.connectionPool, offer);
 
-            ctx.redirect(Path.Web.USER_OFFERS);
+            servePaymentPage(ctx);
 
         } catch (Exception e) {
             System.out.println("ERROR (handleAccept): " + e.getMessage());
             ctx.status(500);
         }
+    }
+
+    public static void servePaymentPage(Context ctx) {
+        ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
+        ctx.render(Path.Template.PAYMENT);
+        ctx.sessionAttribute("errmsg", null);
     }
 
     public static void handleReject(Context ctx) {
