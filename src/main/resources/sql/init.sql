@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS public.bills
     id serial NOT NULL,
     offer_id integer NOT NULL,
     wood_id integer NOT NULL,
+    helptext character varying NOT NULL,
     count integer NOT NULL,
     price double precision NOT NULL,
     PRIMARY KEY (id)
