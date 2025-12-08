@@ -109,9 +109,9 @@
         <a id="tab-matlist" class="tablink tab-button" onclick="openTab(event, 'matlist')">Stykliste</a>
         <a class="tablink tab-button" onclick="openTab(event, 'customer')">Kunde</a>
         <a class="tablink tab-button" onclick="openTab(event, 'drawing')">Tegning</a>
-        <a class="tablink tab-button" onclick="openTab(event, 'offer')">Tilbud</a>
+        <a id="tab-offer" class="tablink tab-button" onclick="openTab(event, 'offer')">Tilbud</a>
     </div>
-    <p th:if="${errmsg}!=null" th:text="${errmsg}"></p>
+    <p class="alert-error" th:if="${errmsg}!=null" th:text="${errmsg}"></p>
     <div id="dimensions" class="tabcontent">
         <form method="POST" action="/sales/calc">
             <div class="frame">
@@ -124,6 +124,12 @@
                 <br>
                 <label for="height">Højde:</label>
                 <input type="number" id="height" name="height" step="any" th:value="${offer.height}/1000">
+                <br>
+                <label for="shedWidth">Skur bredde:</label>
+                <input type="number" id="shedWidth" name="shedWidth" step="any" th:value="${offer.shedWidth}/1000">
+                <br>
+                <label for="shedLength">Skur længde:</label>
+                <input type="number" id="shedLength" name="shedLength" step="any" th:value="${offer.shedLength}/1000">
                 <br>
             </div>
             <button type="submit">Beregn stykliste --></button>
@@ -162,19 +168,6 @@
 
             </table>
         </div>
-        <div class="frame">
-            <h3>Pris og prisforslag</h3>
-            <label>Pris</label>
-            <span th:text="${@app.web.Translator@currency(offer.price)}+' kr.'"></span>
-            <br>
-            <form method="POST" action="/sales/set-price">
-                <label for="salesprice">Prisforslag ved salg</label>
-                <input type="text" step="0.01" id="salesprice" name="salesprice" th:value="${@app.web.Translator@currency(offer.price)}" placeholder="Salgspris">
-                <span>kr.</span>
-                <br>
-                <button type="submit">Sæt pris</button>
-            </form>
-        </div>
     </div>
     <div id="customer" class="tabcontent">
         <div class="frame">
@@ -203,6 +196,13 @@
                 <span>------------------------------------</span><br>
             </div>
         </div>
+        <h3>Ret pris</h3>
+        <form method="post" action="/sales/set-price">
+            <label for="salesprice">Pris (kr):</label>
+            <input id="salesprice" name="salesprice" type="text" step="0.01" th:value="${@app.web.Translator@currency(offer.price)}">
+            <button type="submit">Opdater pris</button>
+        </form>
+        <br><hr><br>
         <form method="POST" action="/sales/send-offer">
             <label for="text">Evt. bemærkning</label>
             <br>
