@@ -159,7 +159,7 @@
                         <td th:text="${bill.quantity}"></td>
                         <td th:text="${bill.woodId}"></td>
                         <td style="text-align: left" th:text="${bill.width + 'x' + bill.height + 'mm. ' + @app.web.Translator@translate(bill.category)}"></td>
-                        <td style="text-align: left" >TODO: helptext</td>
+                        <td style="text-align: left" th:text="${bill.helptext}"></td>
                         <td th:text="${bill.length}"></td>
                         <td th:text="${bill.width}"></td>
                         <td th:text="${bill.height}"></td>

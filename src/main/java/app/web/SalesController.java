@@ -187,6 +187,7 @@ public class SalesController {
                         offer.id,
                         wood.id,
                         need.count,
+                        "TODO: helptext",
                         linePrice
                 );
                 System.out.println("Bill.offerId = " + bill.offerId);
