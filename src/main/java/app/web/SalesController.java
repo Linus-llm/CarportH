@@ -8,6 +8,7 @@ import io.javalin.http.HandlerType;
 import io.javalin.http.HttpStatus;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,7 +106,9 @@ public class SalesController {
             svg.drawPillars(97, 97, new int[]{1000, offer.length/2, offer.length-300});
             ctx.attribute("svg", svg.toString());
 
+            ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
             ctx.render(Path.Template.SALES_NEW_OFFER);
+            ctx.sessionAttribute("errmsg", null);
         } catch (Exception e) {
             System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -249,9 +252,13 @@ public class SalesController {
             return;
         }
         // FIXME: keep material price and sales price seperate
-        offer.price = Integer.parseInt(s);
         try {
+            offer.price = Translator.parseCurrency(s);
             OfferMapper.updatePrice(Server.connectionPool, offer.id, offer.price);
+        } catch (ParseException e) {
+            ctx.sessionAttribute("errmsg", "failed to set price");
+            ctx.redirect(Path.Web.SALES_NEW_OFFER);
+            return;
         } catch (SQLException e) {
             System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
