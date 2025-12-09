@@ -31,7 +31,35 @@
     <strong>Tilbud fra sælger</strong>
     <span th:text="${offer.price}"></span>
     </p>
-<!-- TODO: hide after accept or deny press -->
+
+
+    <div class="stykliste-box">
+        <h3>Styklisten</h3>
+
+        <table class="stykliste-table">
+            <tr>
+                <th>Trætype</th>
+                <th>Antal</th>
+                <th>Længde</th>
+                <th>Bredde</th>
+                <th>Højde</th>
+                <th>Pris</th>
+            </tr>
+
+            <th:block th:each="bill : ${#ctx.getAttribute('bills_' + ${offer.id})}">
+                <tr>
+                    <td th:text="${bill.category}"></td>
+                    <td th:text="${bill.quantity}"></td>
+                    <td th:text="${bill.length}"></td>
+                    <td th:text="${bill.width}"></td>
+                    <td th:text="${bill.height}"></td>
+                    <td th:text="${bill.price} + ' kr'"></td>
+                </tr>
+            </th:block>
+        </table>
+    </div>
+
+    <!-- TODO: hide after accept or deny press -->
     <div th:if="${offer.status.name() == 'SALESPERSON'}">
         <p><em>Tilbuddet er i gang med at blive behandlet af en sælger</em></p>
 

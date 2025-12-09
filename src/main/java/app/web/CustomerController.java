@@ -123,6 +123,13 @@ public class CustomerController{
                 List<Offer> offers = OfferMapper.getCustomerOffers(Server.connectionPool, user.id);
                 System.out.println("User id: " + user.id + ", offers.size() = " + offers.size());
 
+                // henter styklisten til hver offer
+                for (Offer o : offers) {
+                    List<Bill> bills = BillMapper.getBillsByOfferId(Server.connectionPool, o.id);
+                    ctx.attribute("bills_" + o.id, bills);
+                }
+
+
                 ctx.attribute("user", user);
                 ctx.attribute("offers", offers);
                 ctx.render(Path.Template.USER_OFFERS);
