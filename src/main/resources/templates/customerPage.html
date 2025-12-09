@@ -46,16 +46,16 @@
                 <th>Pris</th>
             </tr>
 
-            <th:block th:each="bill : ${#ctx.getAttribute('bills_' + ${offer.id})}">
+            <!--TODO: move to orderConfirmation <th:block th:each="bill : ${#ctx.getAttribute('bills_' + offer.id)}">
                 <tr>
-                    <td th:text="${bill.category}"></td>
+                    <td th:text="${@app.web.Translator@translate(bill.category)}"></td>
                     <td th:text="${bill.quantity}"></td>
                     <td th:text="${bill.length}"></td>
                     <td th:text="${bill.width}"></td>
                     <td th:text="${bill.height}"></td>
                     <td th:text="${bill.price} + ' kr'"></td>
                 </tr>
-            </th:block>
+            </th:block>-->
         </table>
     </div>
 
