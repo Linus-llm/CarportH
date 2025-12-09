@@ -2,13 +2,15 @@ package app.db;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+
+import app.web.SalesController;
 import app.web.Server;
 import java.util.List;
 
 public class CarportCalculator {
 
 
-    public int calcNumberOfPillars(int lengthMm, int widthMm) {
+    public static int calcNumberOfPillars(int lengthMm, int widthMm) {
         int perRow = (int) Math.floor((double) lengthMm / CarportRules.MAX_PILLAR_SPACING_MM) + 1;
 
         //width cannot exceed 6000mm, so max 3 rows of pillars
@@ -17,28 +19,28 @@ public class CarportCalculator {
     }
 
     //return gaps +1 because there needs to be at least two rafters.
-    public int calcNumberOfRafters(int lengthMm) {
+    public static int calcNumberOfRafters(int lengthMm) {
         int gaps = (int) Math.floor((double) lengthMm / CarportRules.RAFTER_SPACING_MM);
         return gaps + 1;
     }
 
     // at least 2 boards for the length of the rem because there is two length-sides
-    public int calcNumberOfBeamsForRemLength(int lengthMm, int boardLengthMm) {
+    public static int calcNumberOfBeamsForRemLength(int lengthMm, int boardLengthMm) {
         return Math.max(((int) Math.ceil((double) lengthMm / boardLengthMm)), CarportRules.MIN_BOARDS);
     }
 
     // at least 2 boards for the length of the rem because there is two width-sides
-    public int calcNumberOfBeamsCoverWidth(int widthMm, int boardWidthMm) {
+    public static int calcNumberOfBeamsCoverWidth(int widthMm, int boardWidthMm) {
         return Math.max(((int) Math.ceil((double) widthMm / boardWidthMm)), CarportRules.MIN_BOARDS);
     }
-    public int calcNumberOfPlanksForShed(int shedLengthMm, int shedWidthMm, int plankLengthMm) {
+    public static int calcNumberOfPlanksForShed(int shedLengthMm, int shedWidthMm, int plankLengthMm) {
         int planksForLength = (int) Math.ceil((double) shedLengthMm / plankLengthMm) * 2;
         int planksForWidth = (int) Math.ceil((double) shedWidthMm / plankLengthMm) * 2;
         return Math.max(planksForLength + planksForWidth, CarportRules.MIN_PLANKS_IF_SHED);
     }
 
     // this uses the above methods to calculate the total list of wood needed for a simple carport based on the dimensions.
-    public List<WoodNeed> calculateNeeds(ConnectionPool cp, int lengthMm, int widthMm, int heightMm) {
+    public static List<WoodNeed> calculateNeeds(ConnectionPool cp, int lengthMm, int widthMm, int heightMm) {
         List<WoodNeed> needs = new ArrayList<>();
 
         // this adds the pieces of wood needed for the pillars
@@ -80,7 +82,7 @@ public class CarportCalculator {
 
     }
 
-    public List<WoodNeed> calculateNeedsWithShed(ConnectionPool cp, int lengthMm, int widthMm, int heightMm, int shedWidthMm, int shedLengthMm) {
+    public static List<WoodNeed> calculateNeedsWithShed(ConnectionPool cp, int lengthMm, int widthMm, int heightMm, int shedWidthMm, int shedLengthMm) {
         List<WoodNeed> needs = calculateNeeds(cp, lengthMm, widthMm, heightMm);
         if (shedWidthMm <= 0 || shedLengthMm <= 0) {
             return needs;
@@ -109,4 +111,56 @@ public class CarportCalculator {
         }
         return needs;
     }
+
+    public static void calculateOffer(ConnectionPool cp, Offer offer, int widthMm, int lengthMm, int heightMm, int shedWidthMm, int shedLengthMm) {
+        offer.width = widthMm;
+        offer.length = lengthMm;
+        offer.height = heightMm;
+        offer.shedWidth = shedWidthMm;
+        offer.shedLength = shedLengthMm;
+        List<WoodNeed> needs = calculateNeedsWithShed(
+                cp,
+                lengthMm,
+                widthMm,
+                heightMm,
+                shedWidthMm,
+                shedLengthMm
+        );
+        if (needs == null) {
+            throw new IllegalStateException("Could not calculate needs for given dimensions");
+        }
+
+        List<Bill> bills = new ArrayList<>();
+        offer.price = 0;
+        try {
+            for (WoodNeed need : needs) {
+                Wood wood = null;
+
+                wood = WoodMapper.getWood(cp, need.type, need.requiredLengthMm);
+                if (wood == null) {
+                    throw new IllegalStateException("No wood found for " + need.type + " length " + need.requiredLengthMm);
+                }
+                double pricePerMeter = wood.pricePerMeter;
+                double lengthMeters = wood.length / 1000.0;
+                double linePrice = pricePerMeter * lengthMeters * need.count;
+                Bill bill = new Bill(
+                        offer.id,
+                        wood.id,
+                        need.count,
+                        "helptext.todo",
+                        linePrice
+                );
+                BillMapper.insert(cp, bill);
+                bills.add(bill);
+                offer.price += bill.price;
+            }
+            OfferMapper.updateOffer(cp, offer);
+            BillMapper.deleteOfferBills(cp, offer.id);
+            BillMapper.addBills(cp, bills);
+        } catch (Exception e){
+            System.out.println("ERROR: " + e.getMessage());
+
+        }
+    }
+
 }

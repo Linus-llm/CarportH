@@ -16,8 +16,7 @@ public class CustomerController{
         app.post(Path.Web.SEND_REQUEST, CustomerController::handleFormPost);
 
 //      app.get(Path.Web.USER_OFFERS, CustomerController::serveUserOffersPage);
-
-        app.post("/offers/{id}/accept", CustomerController::handleAccept);
+        app.post(Path.Web.ACCEPT_OFFER, CustomerController::handleAccept);
         app.post("/offers/{id}/reject", CustomerController::handleReject);
         app.post("/offers/{id}/message", CustomerController::handleMessage);
         app.get(Path.Web.USER_OFFERS, CustomerController::serveOffersPage);
@@ -62,12 +61,12 @@ public class CustomerController{
             int carportLength = Integer.parseInt(ctx.formParam("carportLength"));
             int carportShedWidth = Integer.parseInt(ctx.formParam("carportShedWidth"));
             int carportShedLength = Integer.parseInt(ctx.formParam("carportShedLength"));
-            String adress = "address";
-            int postalcode = 4242;
+            String adress = ctx.formParam("address");
+            int postalcode = Integer.parseInt(ctx.formParam("postalCodes"));
             int height = 2215; // default height
             String text = ctx.formParam("text");
             if (text == null)
-                text = "";
+                text = "t";
             if (text.length() >= 1024)
                 text = text.substring(0, 1024);
             int customerId = user.id;
@@ -124,6 +123,13 @@ public class CustomerController{
                 List<Offer> offers = OfferMapper.getCustomerOffers(Server.connectionPool, user.id);
                 System.out.println("User id: " + user.id + ", offers.size() = " + offers.size());
 
+                // henter styklisten til hver offer
+                for (Offer o : offers) {
+                    List<Bill> bills = BillMapper.getBillsByOfferId(Server.connectionPool, o.id);
+                    ctx.attribute("bills_" + o.id, bills);
+                }
+
+
                 ctx.attribute("user", user);
                 ctx.attribute("offers", offers);
                 ctx.render(Path.Template.USER_OFFERS);
@@ -147,12 +153,18 @@ public class CustomerController{
 
             OfferMapper.updateOffer(Server.connectionPool, offer);
 
-            ctx.redirect(Path.Web.USER_OFFERS);
+            servePaymentPage(ctx);
 
         } catch (Exception e) {
             System.out.println("ERROR (handleAccept): " + e.getMessage());
             ctx.status(500);
         }
+    }
+
+    public static void servePaymentPage(Context ctx) {
+        ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
+        ctx.render(Path.Template.PAYMENT);
+        ctx.sessionAttribute("errmsg", null);
     }
 
     public static void handleReject(Context ctx) {
