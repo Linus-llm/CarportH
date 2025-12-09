@@ -63,23 +63,25 @@
     <div th:if="${offer.status.name() == 'SALESPERSON'}">
         <p><em>Tilbuddet er i gang med at blive behandlet af en sælger</em></p>
 
-    </div>
-    <div th:unless="${offer.status.name() == 'SALESPERSON'}">
-    <div class="button-row">
-    <form th:action="@{/offers/{id}/accept(id=${offer.id})}" method="post">
-    <button type="submit" class="standard-blue-button">
-        Accepter tilbud
-    </button>
-    </form>
-
-    <form th:action="@{/offers/{id}/reject(id=${offer.id})}" method="post">
-        <button type="submit" class="standard-blue-button">
-            Afvis tilbud
-        </button>
-    </form>
-    </div>
-
     <form th:action="@{/offers/{id}/message(id=${offer.id})}" method="post" class="message-form">
+
+        <div class="arial-font button-row">
+            <label>
+                <input type="radio"
+                       name="decision"
+                       value="ACCEPTED"
+                       required>
+                Accepter tilbud
+            </label>
+
+            <label>
+                <input type="radio"
+                       name="decision"
+                       value="REJECTED">
+                Afvis tilbud
+            </label>
+        </div>
+
         <label class="visually-hidden"
                th:for="'comment-' + ${offer.id}">
             Kommentar til tilbud
@@ -88,14 +90,12 @@
                 th:id="'comment-' + ${offer.id}"
                 name="comment"
                 placeholder="Evt. vedhæft kommentar til dit modtilbud her"
-                rows="3">
-</textarea>
+                rows="3"></textarea>
 
-        <button type="submit" class="standard-blue-button disabled-when-empty">
+        <button type="submit" class="standard-blue-button">
             Send melding
         </button>
     </form>
-    </div>
 </section>
 </div>
 </div>

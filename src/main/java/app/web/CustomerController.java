@@ -200,14 +200,10 @@ public class CustomerController{
                 return;
             }
 
-            // 1) Læg kommentaren et sted i Offer-objektet
-            // LIGE NU bruger vi "text"-feltet, da det allerede findes i DB
             offer.text = comment;
 
-            // 2) Gem i databasen
             OfferMapper.updateOffer(Server.connectionPool, offer);
 
-            // 3) Redirect tilbage til oversigten
             ctx.redirect(Path.Web.USER_OFFERS);
 
         } catch (Exception e) {
