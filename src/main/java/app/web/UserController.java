@@ -1,8 +1,5 @@
 package app.web;
 
-import app.db.Offer;
-import app.db.OfferMapper;
-import app.db.ConnectionPool;
 import app.db.UserMapper;
 import app.db.User;
 import app.exceptions.DBException;
@@ -10,8 +7,6 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class UserController {
 

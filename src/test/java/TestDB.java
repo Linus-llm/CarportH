@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestDB {
 
-    CarportCalculator c = new CarportCalculator();
     private static ConnectionPool cp;
 
 
@@ -62,7 +61,7 @@ public class TestDB {
         assertTrue(wood.length >= 2000, "Wood lenght should be at least the wished length");
     }
     @Test
-    void login_validUser_returnsUser() throws DBException {
+    void testLoginValidUserAndreturnsUser() throws DBException {
         // arrange
         String email = "ole@customer.dk";
         // password is irrelevant because your hashing is not used in test;
@@ -77,12 +76,13 @@ public class TestDB {
         assertEquals(email, user.email);
     }
 
-    void getBillsByOfferId_returnsInsertedBill() throws Exception {
-        // arrange: create a minimal offer
+    @Test
+    void testInsertAndGetBillsByOfferId() throws Exception {
+
         Offer offer = new Offer(
                 0,
-                1,                // customerId (ole)
-                1,                // salespersonId
+                1,
+                1,
                 "Testvej 1",
                 4242,
                 "Bobville",
@@ -95,38 +95,32 @@ public class TestDB {
                 "test",
                 OfferStatus.SALESPERSON
         );
-        assertTrue(OfferMapper.addOffer(cp, offer));
-        assertTrue(offer.id > 0);
+        assertTrue(OfferMapper.addOffer(cp, offer), "Offer insert should succeed");
 
-        // arrange: find a wood and insert a bill
+        List<Offer> offers = OfferMapper.getCustomerOffers(cp, offer.customerId);
+        assertFalse(offers.isEmpty(), "Customer should have at least one offer");
+        Offer dbOffer = offers.get(offers.size() - 1);
+
         Wood wood = WoodMapper.getWood(cp, WoodCategory.BEAM, 3000);
-        assertNotNull(wood);
+        assertNotNull(wood, "Expected a BEAM wood of 3000mm in test data");
 
         Bill bill = new Bill(
-                offer.id,
+                dbOffer.id,
                 wood.id,
-                4,
+                2,
                 "helptext.todo",
                 123.45
         );
-        assertTrue(BillMapper.insert(cp, bill));
-
-        // act
-        List<Bill> bills = BillMapper.getBillsByOfferId(cp, offer.id);
-
-        // assert
-        assertNotNull(bills);
-        assertFalse(bills.isEmpty(), "Bills list should not be empty");
+        assertTrue(BillMapper.insert(cp, bill), "Bill insert should succeed");
+        List<Bill> bills = BillMapper.getBillsByOfferId(cp, dbOffer.id);
+        assertEquals(1, bills.size(), "Exactly one bill expected for this offer");
         Bill b = bills.get(0);
-        assertEquals(offer.id, b.offerId);
         assertEquals(wood.id, b.woodId);
-        assertEquals(4, b.quantity);
+        assertEquals(2, b.quantity);
+        assertEquals(3000, b.length);
+        assertEquals(WoodCategory.BEAM, b.category);
         assertEquals("helptext.todo", b.helptext);
-        assertEquals(123.45, b.price, 0.0001);
-        assertTrue(b.length > 0);
-        assertTrue(b.width > 0);
-        assertTrue(b.height > 0);
-        assertNotNull(b.category);
     }
+
 
 }

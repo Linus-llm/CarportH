@@ -11,7 +11,6 @@ import io.javalin.http.HttpStatus;
 
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class SalesController {
