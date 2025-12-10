@@ -5,8 +5,8 @@ public class CarportRules {
     public static final int RAFTER_SPACING_MM = 550;
     public static final int MAX_PILLAR_SPACING_MM = 3000;
     public static final int MIN_PILLARS = 4;
-    public static final int MIN_BOARDS= 2;// at least 2
-    public static final int MIN_PILLARS_IF_SHED = 7; //der kan komme en ekstra stolpe hvis den er længere.
+    public static final int MIN_BOARDS= 2;
+    public static final int MIN_PILLARS_IF_SHED = 7;
     public static final int MIN_PLANKS_IF_SHED = 4;
 
 

@@ -2,6 +2,8 @@ package app.web;
 
 import app.db.*;
 import app.draw.CarportSVG;
+import app.exceptions.CarportCalculationException;
+import app.exceptions.DBException;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HandlerType;
@@ -119,7 +121,7 @@ public class SalesController {
         }
     }
 
-    public static void handleCalcPost(Context ctx) {
+    public static void handleCalcPost(Context ctx) throws DBException, CarportCalculationException {
         Offer offer;
 
 
@@ -151,7 +153,7 @@ public class SalesController {
         ctx.redirect(Path.Web.SALES_NEW_OFFER+offer.id);
     }
 
-    public static void handleSendOfferPost(Context ctx) {
+    public static void handleSendOfferPost(Context ctx) throws SQLException, DBException {
         Offer offer;
 
         offer = ctx.sessionAttribute("offer");
@@ -159,37 +161,31 @@ public class SalesController {
             ctx.status(HttpStatus.BAD_REQUEST);
             return;
         }
-        try {
-            offer.text = ctx.formParam("text");
-            String price = ctx.formParam("price");
-            if(price != null && !price.isEmpty()){
-            offer.price = (int) Double.parseDouble(price);}
-            offer.status = OfferStatus.CUSTOMER;
-            OfferMapper.updateOffer(Server.connectionPool, offer);
-        } catch (SQLException e) {
-            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
-            return;
+
+        offer.text = ctx.formParam("text");
+        String price = ctx.formParam("price");
+        if(price != null && !price.isEmpty()){
+            offer.price = (int) Double.parseDouble(price);
         }
+        offer.status = OfferStatus.CUSTOMER;
+        OfferMapper.updateOffer(Server.connectionPool, offer);
+
         ctx.redirect(Path.Web.SALES);
     }
 
-    public static void handleClaimOfferPost(Context ctx) {
+    public static void handleClaimOfferPost(Context ctx) throws SQLException, DBException {
         User user = ctx.sessionAttribute("user");
         assert user != null;
         assert user.role == UserRole.SALESPERSON;
 
         int offerId = Integer.parseInt(ctx.pathParam("id"));
-        try {
-            OfferMapper.assignSalesperson(Server.connectionPool, offerId, user.id);
-            ctx.redirect(Path.Web.SALES);
-        } catch (SQLException e) {
-            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        OfferMapper.assignSalesperson(Server.connectionPool, offerId, user.id);
+        ctx.redirect(Path.Web.SALES);
+
     }
 
-    public static void handleUpdatePrice(Context ctx) {
+    public static void handleUpdatePrice(Context ctx) throws SQLException, DBException {
 
         Offer offer = ctx.sessionAttribute("offer");
         String s = ctx.formParam("salesprice");
@@ -206,12 +202,7 @@ public class SalesController {
             ctx.sessionAttribute("errmsg", "* failed to set price");
             ctx.redirect(Path.Web.SALES_NEW_OFFER+offer.id);
             return;
-        } catch (SQLException e) {
-            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
-            return;
         }
-
         ctx.redirect(Path.Web.SALES_NEW_OFFER+offer.id);
     }
 }

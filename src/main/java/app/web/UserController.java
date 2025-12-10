@@ -5,6 +5,7 @@ import app.db.OfferMapper;
 import app.db.ConnectionPool;
 import app.db.UserMapper;
 import app.db.User;
+import app.exceptions.DBException;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
@@ -29,8 +30,7 @@ public class UserController {
         ctx.sessionAttribute("errmsg", null);
     }
 
-    public static void handleLoginPost(Context ctx)
-    {
+    public static void handleLoginPost(Context ctx) throws DBException {
         User user;
         String redirect = ctx.sessionAttribute("loginredirect");
         String email = ctx.formParam("email");
@@ -65,8 +65,7 @@ public class UserController {
         ctx.redirect(Path.Web.INDEX);
     }
 
-    public static void handleRegisterPost(Context ctx)
-    {
+    public static void handleRegisterPost(Context ctx) throws DBException {
         String name = ctx.formParam("name");
         String email = ctx.formParam("email");
         String password = ctx.formParam("password");

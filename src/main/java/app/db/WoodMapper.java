@@ -1,5 +1,7 @@
 package app.db;
 
+import app.exceptions.DBException;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,7 +13,7 @@ public class WoodMapper {
 
     //This method retrieves a wood piece from the database that matches the specified category of wood and has a length greater than or equal to the desired length.
     //The sql query is very specific about using the best matched length and not just any piece that is longer than the required length.
-    public static Wood getWood(ConnectionPool cp, WoodCategory category, int wishLength) throws SQLException {
+    public static Wood getWood(ConnectionPool cp, WoodCategory category, int wishLength) throws DBException{
         String sql =
                 "SELECT w.id AS wood_id, w.length, " +
                         "       wp.id AS profile_id, wp.category, wp.width, wp.height, wp.price " +
@@ -40,10 +42,12 @@ public class WoodMapper {
                     );
                 }
             }
+        } catch (SQLException e) {
+            throw new DBException("Failed to get wood: " + e.getMessage());
         }
         return null;
     }
-    public static List<Wood> getWoodsByCategory(ConnectionPool cp, WoodCategory category) throws SQLException {
+    public static List<Wood> getWoodsByCategory(ConnectionPool cp, WoodCategory category) throws DBException {
         String sql = "SELECT w.id, w.profile_id, w.length, wp.price, wp.category, wp.width, wp.height " +
                 "FROM woods w " +
                 "JOIN wood_profiles wp ON w.profile_id = wp.id " +
@@ -66,6 +70,8 @@ public class WoodMapper {
                     ));
                 }
             }
+        } catch (SQLException e) {
+            throw new DBException("Failed to get woods by category: " + e.getMessage());
         }
         return result;
     }

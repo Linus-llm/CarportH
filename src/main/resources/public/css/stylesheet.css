@@ -119,9 +119,9 @@
     text-decoration: none;
 }
 
-.header-menu-button-tilbud,
+.header-menu-button-offer,
 .header-menu-button-login,
-.header-menu-button-forespørgsel,
+.header-menu-button-query,
 .header-menu-button-SælgerView,
 .header-menu-button-index,
 .header-menu-button-logout{
@@ -139,9 +139,9 @@
 .alert-success
 { color: green; margin: 0.5rem 0; }
 
-.header-menu-button-tilbud:hover,
+.header-menu-button-offer:hover,
 .header-menu-button-login:hover,
-.header-menu-button-forespørgsel:hover,
+.header-menu-button-query:hover,
 .header-menu-button-SælgerView:hover,
 .header-menu-button-index:hover,
 .header-menu-button-logout:hover{

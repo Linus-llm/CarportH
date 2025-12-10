@@ -12,15 +12,6 @@ public class Bill {
     public int width;
     public WoodCategory category;
 
-    public Bill(int id, int offerId, int woodId, int quantity, String helptext, double price) {
-        this.id = id;
-        this.offerId = offerId;
-        this.woodId = woodId;
-        this.quantity = quantity;
-        this.price = price;
-        this.helptext = helptext;
-    }
-
     public Bill(int offerId, int woodId, int quantity, String helptext, double price) {
         this.offerId = offerId;
         this.woodId = woodId;

@@ -1,4 +1,5 @@
 package app.db;
+import app.exceptions.DBException;
 import app.web.Server;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -32,7 +33,7 @@ public class UserMapper {
         return factory.generateSecret(spec).getEncoded();
     }
 
-    public static User login(ConnectionPool cp, String email, String password)
+    public static User login(ConnectionPool cp, String email, String password) throws DBException
     {
         User user = null;
 
@@ -60,13 +61,13 @@ public class UserMapper {
             assert !rs.next();
 
         } catch (Exception e) {
-            System.err.println(e);
+            throw new DBException("Failed to login: " + e.getMessage());
         }
 
         return user;
     }
 
-    public static boolean register(ConnectionPool cp, String name, String email, String password)
+    public static boolean register(ConnectionPool cp, String name, String email, String password) throws DBException
     {
         PreparedStatement ps;
         ResultSet rs;
@@ -89,7 +90,7 @@ public class UserMapper {
                 return (ps.executeUpdate() > 0);
             }
         } catch (Exception e) {
-            System.err.println(e);
+            throw new DBException("Failed to register: " + e.getMessage());
         }
 
         return false;
