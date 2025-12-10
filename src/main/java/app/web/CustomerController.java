@@ -21,7 +21,7 @@ public class CustomerController{
         app.post("/offers/{id}/message", CustomerController::handleMessage);
         app.get(Path.Web.USER_OFFERS, CustomerController::serveOffersPage);
 
-        app.get("/orderConfirmation", ctx -> ctx.render("orderConfirmation.html"));
+        app.get("/orderConfirmation", CustomerController::serveOrderConfirmation);
     }
 
     public static void serveIndexPage(Context ctx) throws SQLException {
@@ -212,6 +212,35 @@ public class CustomerController{
 
         } catch (Exception e) {
             System.out.println("ERROR (handleMessage): " + e.getMessage());
+            ctx.status(500);
+        }
+    }
+    public static void serveOrderConfirmation(Context ctx) {
+        int offerId = Integer.parseInt(ctx.queryParam("offerId"));
+
+        try {
+            // 1. hent offer
+            Offer offer = OfferMapper.getOffer(Server.connectionPool, offerId);
+            if (offer == null) {
+                ctx.status(404);
+                return;
+            }
+
+            // 2. ændr status til PAID
+            offer.status = OfferStatus.ORDERED;
+            OfferMapper.updateOffer(Server.connectionPool, offer);
+
+            // 3. hent styklisten
+            List<Bill> bills = BillMapper.getBillsByOfferId(Server.connectionPool, offerId);
+
+            // 4. send data til kvitterings.html
+            ctx.attribute("offer", offer);
+            ctx.attribute("bills", bills);
+
+            ctx.render("orderReceipt.html");
+
+        } catch (Exception e) {
+            System.out.println("ERROR (serveOrderConfirmation): " + e.getMessage());
             ctx.status(500);
         }
     }

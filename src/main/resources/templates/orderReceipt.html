@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Kvittering – Betaling gennemført</title>
+  <link rel="stylesheet" href="/css/stylesheet.css" th:href="@{/css/stylesheet.css}">
+</head>
+
+<body>
+
+<div class="flexbox-item-upperbanner">
+  <th:block th:insert="~{/fragments.html :: header}"></th:block>
+</div>
+
+<div class="page-wrapper">
+
+  <h1>Tak for din betaling</h1>
+  <p class="intro-text">
+    Din bestilling er nu registreret. Nedenfor kan du se en kvittering samt styklisten for din carport.
+  </p>
+
+  <!-- --- OFFER INFO --- -->
+  <div class="offer-summary-box">
+    <h2>Ordreoplysninger</h2>
+
+    <p><strong>Ordre-ID:</strong> <span th:text="${offer.id}"></span></p>
+    <p><strong>Adresse:</strong> <span th:text="${offer.address}"></span></p>
+    <p><strong>Postnummer:</strong> <span th:text="${offer.postalcode}"></span></p>
+    <p><strong>Carport dimensioner:</strong>
+      <span th:text="${offer.width}"></span> mm x
+      <span th:text="${offer.length}"></span> mm
+    </p>
+
+    <p><strong>Betalt pris:</strong>
+      <span th:text="${offer.price} + ' kr'"></span>
+    </p>
+  </div>
+
+
+  <!-- --- MATERIAL LIST / STYKLISTE --- -->
+  <div class="stykliste-box">
+    <h2>Styklisten</h2>
+
+    <table class="stykliste-table">
+      <thead>
+      <tr>
+        <th>Trætype</th>
+        <th>Antal</th>
+        <th>Længde</th>
+        <th>Bredde</th>
+        <th>Højde</th>
+        <th>Pris</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr th:each="bill : ${bills}">
+        <td th:text="${bill.category}"></td>
+        <td th:text="${bill.quantity}"></td>
+        <td th:text="${bill.length}"></td>
+        <td th:text="${bill.width}"></td>
+        <td th:text="${bill.height}"></td>
+        <td th:text="${bill.price} + ' kr'"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- --- BACK TO OFFERS BUTTON --- -->
+  <div style="margin-top: 30px;">
+    <form th:action="@{/customer/offers}" method="get">
+      <button class="standard-blue-button">Tilbage til mine forespørgsler</button>
+    </form>
+  </div>
+
+</div>
+
+</body>
+</html>
