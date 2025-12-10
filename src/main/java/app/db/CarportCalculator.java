@@ -147,6 +147,7 @@ public class CarportCalculator {
                         offer.id,
                         wood.id,
                         need.count,
+                        "helptext.todo",
                         linePrice
                 );
                 BillMapper.insert(cp, bill);

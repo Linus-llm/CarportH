@@ -147,12 +147,12 @@ public class SalesController {
 
         CarportCalculator.calculateOffer(Server.connectionPool,offer, offer.width, offer.length, offer.height, offer.shedWidth, offer.shedLength);
 
-        /*path = Path.Web.SALES_NEW_OFFER;
+        path = Path.Web.SALES_NEW_OFFER;
         idx = path.indexOf('{');
         path = path.substring(0, idx);
         path += offer.id;
         ctx.sessionAttribute("defaultTab", "tab-matlist");
-        ctx.redirect(Path.Web.SALES_NEW_OFFER+offer.id);*/
+        ctx.redirect(Path.Web.SALES_NEW_OFFER+offer.id);
     }
 
     public static void handleSendOfferPost(Context ctx) {
