@@ -21,16 +21,6 @@ public class SVG {
         svg.append("\">");
     }
 
-    public SVG(int width, int height)
-    {
-        svg.append("<svg");
-        svg.append(" width=\"");
-        svg.append(width);
-        svg.append("\" height=\"");
-        svg.append(height);
-        svg.append("\">");
-    }
-
     public void line(int x1, int y1, int x2, int y2, String style)
     {
         svg.append("<line style=\"");
