@@ -2,8 +2,7 @@ package app.db;
 
 import app.exceptions.CarportCalculationException;
 import app.exceptions.DBException;
-import java.util.ArrayList;
-import java.sql.SQLException;
+
 import java.util.ArrayList;
 
 import java.util.List;
@@ -177,7 +176,7 @@ public class CarportCalculator {
 
     // calculate bills/material list from an offer
     public static List<Bill> calcBills(ConnectionPool cp, Offer offer)
-            throws DBException
+            throws DBException, CarportCalculationException
     {
         int cnt;
         Wood wood;
@@ -188,7 +187,7 @@ public class CarportCalculator {
         cnt = calcNumberOfRafters(offer.length);
         wood = WoodMapper.getWood(cp, WoodCategory.RAFTER, offer.width);
         if (wood == null)
-            return null;
+            throw new CarportCalculationException("rafters");
         price = (float)wood.pricePerMeter*(wood.length/1000.0);
         bills.add(new Bill(offer.id, wood.id, cnt, "helptext.rafters", cnt*price));
 
@@ -196,7 +195,7 @@ public class CarportCalculator {
         cnt = 2;
         wood = WoodMapper.getWood(cp, WoodCategory.RAFTER, offer.length);
         if (wood == null)
-            return null;
+            throw new CarportCalculationException("beams");
         price = (float)wood.pricePerMeter*(wood.length/1000.0);
         bills.add(new Bill(offer.id, wood.id, cnt, "helptext.beams", cnt*price));
 
@@ -208,14 +207,14 @@ public class CarportCalculator {
         cnt += calcShedLengthPillarCnt(innerWidth, offer.shedWidth, offer.shedLength);
         wood = WoodMapper.getWood(cp, WoodCategory.PILLAR, offer.height);
         if (wood == null)
-            return null;
+            throw new CarportCalculationException("pillars");
         price = (float)wood.pricePerMeter*(wood.length/1000.0);
         bills.add(new Bill(offer.id, wood.id, cnt, "helptext.pillars", cnt*price));
 
         // planks
         wood = WoodMapper.getWood(cp, WoodCategory.PLANK, 0);
         if (wood == null)
-            return null;
+            throw new CarportCalculationException("planks");
         cnt = calcNumberOfPlanksForShed(offer.shedLength, offer.shedWidth, wood.length);
         price = (float)wood.pricePerMeter*(wood.length/1000.0);
         bills.add(new Bill(offer.id, wood.id, cnt, "helptext.shedplanks", cnt*price));

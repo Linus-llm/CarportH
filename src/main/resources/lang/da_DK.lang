@@ -6,3 +6,8 @@ helptext.pillars=Stolper nedgraves 90 cm. i jord
 helptext.rafters=Spær, monteres på rem
 helptext.beams=Remme i sider, sadles ned i stolper
 helptext.shedplanks=Til beklædning af skur
+
+error.calc.rafters=* kunne ikke beregne spær
+error.calc.beams=* kunne ikke beregne remme
+error.calc.pillars=* kunne ikke beregne stolper
+error.calc.planks=* kunne ikke beregne brædder

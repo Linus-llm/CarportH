@@ -9,7 +9,6 @@ import io.javalin.http.Context;
 import io.javalin.http.HandlerType;
 import io.javalin.http.HttpStatus;
 
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.logging.Logger;
@@ -129,7 +128,7 @@ public class SalesController {
         }
     }
 
-    public static void handleCalcPost(Context ctx) throws DBException, CarportCalculationException {
+    public static void handleCalcPost(Context ctx) {
         Offer offer;
 
 
@@ -158,16 +157,18 @@ public class SalesController {
         try {
             BillMapper.deleteOfferBills(Server.connectionPool, offer.id);
             List<Bill> bills = CarportCalculator.calcBills(Server.connectionPool, offer);
-            if (bills == null)
-                ctx.sessionAttribute("errmsg", "* kunne ikke beregne stykliste");
-            else
-                if (!BillMapper.addBills(Server.connectionPool, bills))
-                    throw new SQLException("addBills returned false");
+            if (!BillMapper.addBills(Server.connectionPool, bills))
+                throw new DBException("addBills returned false");
 
             if (!OfferMapper.updateOffer(Server.connectionPool, offer))
-                throw new SQLException("updateOffer returned false");
-        } catch (SQLException e) {
-            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
+                throw new DBException("updateOffer returned false");
+
+        } catch (CarportCalculationException e) {
+            ctx.sessionAttribute("errmsg", Translator.translate("error.calc."+e.getMessage()));
+            ctx.redirect(Path.Web.SALES_NEW_OFFER+offer.id);
+            return;
+        } catch (DBException e) {
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             return;
         }
@@ -176,7 +177,7 @@ public class SalesController {
         ctx.redirect(Path.Web.SALES_NEW_OFFER+offer.id);
     }
 
-    public static void handleSendOfferPost(Context ctx) throws SQLException, DBException {
+    public static void handleSendOfferPost(Context ctx) {
         Offer offer;
 
         offer = ctx.sessionAttribute("offer");
@@ -186,29 +187,36 @@ public class SalesController {
         }
 
         offer.text = ctx.formParam("text");
-        String price = ctx.formParam("price");
-        if(price != null && !price.isEmpty()){
-            offer.price = (int) Double.parseDouble(price);
+        try {
+            offer.status = OfferStatus.CUSTOMER;
+            OfferMapper.updateOffer(Server.connectionPool, offer);
+        } catch (DBException e) {
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            return;
         }
-        offer.status = OfferStatus.CUSTOMER;
-        OfferMapper.updateOffer(Server.connectionPool, offer);
-
         ctx.redirect(Path.Web.SALES);
     }
 
-    public static void handleClaimOfferPost(Context ctx) throws SQLException, DBException {
+    public static void handleClaimOfferPost(Context ctx) {
         User user = ctx.sessionAttribute("user");
         assert user != null;
         assert user.role == UserRole.SALESPERSON;
 
         int offerId = Integer.parseInt(ctx.pathParam("id"));
 
-        OfferMapper.assignSalesperson(Server.connectionPool, offerId, user.id);
+        try {
+            OfferMapper.assignSalesperson(Server.connectionPool, offerId, user.id);
+        } catch (DBException e) {
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            return;
+        }
         ctx.redirect(Path.Web.SALES);
 
     }
 
-    public static void handleUpdatePrice(Context ctx) throws SQLException, DBException {
+    public static void handleUpdatePrice(Context ctx) {
 
         Offer offer = ctx.sessionAttribute("offer");
         String s = ctx.formParam("salesprice");
@@ -223,6 +231,9 @@ public class SalesController {
         } catch (ParseException e) {
             ctx.sessionAttribute("errmsg", "* failed to set price");
             ctx.redirect(Path.Web.SALES_NEW_OFFER+offer.id);
+            return;
+        } catch (DBException e) {
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             return;
         }
         ctx.redirect(Path.Web.SALES_NEW_OFFER+offer.id);
