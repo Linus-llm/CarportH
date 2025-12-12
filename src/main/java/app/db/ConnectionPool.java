@@ -16,7 +16,7 @@ public class ConnectionPool {
             throws SQLException
     {
         try {
-            Logger.getLogger("web").log(Level.INFO,
+            Logger.getLogger("db").log(Level.INFO,
                     String.format("Connection Pool created for: (%s, %s, %s, %s)", user, password, url, db));
             HikariConfig config = new HikariConfig();
             config.setDriverClassName("org.postgresql.Driver");

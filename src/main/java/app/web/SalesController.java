@@ -12,8 +12,12 @@ import io.javalin.http.HttpStatus;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class SalesController {
+
+    private static Logger logger = Logger.getLogger("web");
 
     public static void addRoutes(Javalin app) {
         app.before(Path.Web.SALES + "*", SalesController::before);
@@ -62,7 +66,7 @@ public class SalesController {
 
             ctx.render(Path.Template.SALES);
         } catch (Exception e) {
-            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -125,7 +129,7 @@ public class SalesController {
             ctx.render(Path.Template.SALES_NEW_OFFER);
             ctx.sessionAttribute("errmsg", null);
         } catch (Exception e) {
-            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -221,7 +225,6 @@ public class SalesController {
             ctx.status(HttpStatus.BAD_REQUEST);
             return;
         }
-        // FIXME: keep material price and sales price seperate
         ctx.sessionAttribute("defaultTab", "tab-matlist");
         try {
             offer.price = Translator.parseCurrency(s);
