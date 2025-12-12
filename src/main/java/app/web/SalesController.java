@@ -31,11 +31,6 @@ public class SalesController {
 
     public static void before(Context ctx) {
         User user = ctx.sessionAttribute("user");
-        if (user == null) { // FIXME: for debugging
-            user = new User(2, "bob", "bob@salesperson.dk", UserRole.SALESPERSON);
-            ctx.sessionAttribute("user", user);
-            return;
-        }
         if (user == null || user.role != UserRole.SALESPERSON) {
             if (ctx.method() == HandlerType.GET) {
                 ctx.sessionAttribute("loginredirect", ctx.path());
@@ -177,10 +172,6 @@ public class SalesController {
             return;
         }
 
-        path = Path.Web.SALES_NEW_OFFER;
-        idx = path.indexOf('{');
-        path = path.substring(0, idx);
-        path += offer.id;
         ctx.sessionAttribute("defaultTab", "tab-matlist");
         ctx.redirect(Path.Web.SALES_NEW_OFFER+offer.id);
     }

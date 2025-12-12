@@ -177,7 +177,7 @@ public class CarportCalculator {
 
     // calculate bills/material list from an offer
     public static List<Bill> calcBills(ConnectionPool cp, Offer offer)
-            throws SQLException
+            throws DBException
     {
         int cnt;
         Wood wood;
@@ -239,7 +239,7 @@ public class CarportCalculator {
         //width
         Wood wood = null;
 
-        wood = WoodMapper.getWood(cp, WoodCategory.BEAM, widthMm);
+        wood = WoodMapper.getWood(cp, WoodCategory.RAFTER, widthMm);
 
         if (wood == null) {
             throw new CarportCalculationException("No wood found for BEAM width " + widthMm);
@@ -248,7 +248,7 @@ public class CarportCalculator {
         needs.add(new WoodNeed(WoodCategory.RAFTER, widthMm, beamCountWidth));
         //length
 
-        wood = WoodMapper.getWood(cp, WoodCategory.BEAM, lengthMm);
+        wood = WoodMapper.getWood(cp, WoodCategory.RAFTER, lengthMm);
 
         if (wood == null) {
             throw new CarportCalculationException("No wood found for BEAM length " + lengthMm);
@@ -271,7 +271,7 @@ public class CarportCalculator {
         // adding extra pillars for the shed and calculating planks needed
         if (shedWidthMm <= 3000) {
             needs.add(new WoodNeed(WoodCategory.PILLAR, heightMm, CarportRules.MIN_PILLARS_IF_SHED - CarportRules.MIN_PILLARS));
-            wood = WoodMapper.getWood(cp, WoodCategory.BEAM, heightMm);
+            wood = WoodMapper.getWood(cp, WoodCategory.RAFTER, heightMm);
             if (wood == null) {
                 throw new CarportCalculationException("No suitable BEAM found for shed planks");
             }
@@ -282,7 +282,7 @@ public class CarportCalculator {
             needs.add(new WoodNeed(WoodCategory.PILLAR, heightMm, CarportRules.MIN_PILLARS_IF_SHED+1 - CarportRules.MIN_PILLARS));
 
             //the wished length here refers to the height of the plank needed for the shed walls thus same height as pillar
-            wood = WoodMapper.getWood(cp, WoodCategory.BEAM, heightMm);
+            wood = WoodMapper.getWood(cp, WoodCategory.RAFTER, heightMm);
 
             if (wood == null) {
                 throw new CarportCalculationException("No suitable BEAM found for shed planks");
