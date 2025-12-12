@@ -34,9 +34,9 @@
     </a>
   </div>
   <div th:if="${user != null}" class="header-menu-item">
-    <a href="/logout">
-      <button class="header-menu-button-logout" type="button">Log ud</button>
-    </a>
+    <form action="/logout" method="post" style="display:inline;">
+      <button class="header-menu-button-logout" type="submit">Log ud</button>
+    </form>
   </div>
 
 </div>

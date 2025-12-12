@@ -1,11 +1,10 @@
 package app.web;
 
 import app.db.*;
+import app.exceptions.DBException;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
-
-import java.sql.SQLException;
 import java.util.List;
 
 public class CustomerController{
@@ -14,8 +13,6 @@ public class CustomerController{
     {
         app.get(Path.Web.INDEX, CustomerController::serveIndexPage);
         app.post(Path.Web.SEND_REQUEST, CustomerController::handleFormPost);
-
-//      app.get(Path.Web.USER_OFFERS, CustomerController::serveUserOffersPage);
         app.post(Path.Web.ACCEPT_OFFER, CustomerController::handleAccept);
         app.post("/offers/{id}/reject", CustomerController::handleReject);
         app.post("/offers/{id}/message", CustomerController::handleMessage);
@@ -24,7 +21,7 @@ public class CustomerController{
         app.get("/orderConfirmation", CustomerController::serveOrderConfirmation);
     }
 
-    public static void serveIndexPage(Context ctx) throws SQLException {
+    public static void serveIndexPage(Context ctx) throws DBException {
         User user = ctx.sessionAttribute("user");
 
 
@@ -48,20 +45,19 @@ public class CustomerController{
     }
 
     public static void handleFormPost(Context ctx) {
-        //TODO tilføj check af user ikke er null
-
         Offer offer;
         User user = ctx.sessionAttribute("user");
-        if (user == null) { // FIXME: for debugging
-            user = new User(1, "ole", "ole@customer.dk", UserRole.SALESPERSON);
-            ctx.sessionAttribute("user", user);
+        if (user == null) {
+            ctx.sessionAttribute("errmsg", "Du skal være logget ind for at sende en forespørgsel.");
+            ctx.redirect(Path.Web.INDEX);
+            return;
         }
         try {
             int carportWidth = Integer.parseInt(ctx.formParam("carportWidth"));
             int carportLength = Integer.parseInt(ctx.formParam("carportLength"));
             int carportShedWidth = Integer.parseInt(ctx.formParam("carportShedWidth"));
             int carportShedLength = Integer.parseInt(ctx.formParam("carportShedLength"));
-            String adress = ctx.formParam("address");
+            String address = ctx.formParam("address");
             int postalcode = Integer.parseInt(ctx.formParam("postalCodes"));
             int height = 2215; // default height
             String text = ctx.formParam("text");
@@ -77,10 +73,10 @@ public class CustomerController{
             String city = "København";
             double price = 0.0;
 
-            offer = new Offer(0, customerId, salespersonId, adress, postalcode, city, carportWidth, height, carportLength, carportShedWidth, carportShedLength, price, text, OfferStatus.SALESPERSON);
+            offer = new Offer(0, customerId, salespersonId, address, postalcode, city, carportWidth, height, carportLength, carportShedWidth, carportShedLength, price, text, OfferStatus.SALESPERSON);
             if (!OfferMapper.addQuery(Server.connectionPool, offer))
                 throw new Exception("addQuery failed");
-            //tester
+
             ctx.sessionAttribute("successTxt", "* Din forespørgsel er sendt!");
             ctx.redirect(Path.Web.INDEX);
         } catch (Exception e) {
@@ -89,27 +85,6 @@ public class CustomerController{
             ctx.redirect(Path.Web.INDEX);
         }
     }
-
-//    public static void serveUserOffersPage(Context ctx)
-//    {
-//        try {
-//            User user = ctx.sessionAttribute("user");
-//            if (user == null) {
-//                ctx.sessionAttribute("loginredirect", Path.Web.USER_OFFERS);
-//                ctx.redirect(Path.Web.LOGIN);
-//                return;
-//            }
-//
-//            List<Offer> offers = OfferMapper.getCustomerOffers(Server.connectionPool, user.id);
-//
-//            ctx.attribute("user", user);
-//            ctx.attribute("offers", offers);
-//            ctx.render(Path.Template.USER_OFFERS);
-//        } catch (Exception e) {
-//            System.out.println("ERROR: " + e.getMessage());
-//            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
         public static void serveOffersPage(Context ctx)
         {
             try {

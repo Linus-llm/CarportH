@@ -1,4 +1,5 @@
 import app.db.*;
+import app.exceptions.DBException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -13,35 +14,29 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestDB {
 
-    private static final String JDBC_USER = System.getenv("JDBC_USER");
-    private static final String JDBC_PASSWORD = System.getenv("JDBC_PASSWORD");
-    private static final String JDBC_URL = System.getenv("JDBC_URL");
-    private static final String JDBC_DB = System.getenv("JDBC_DB");
     private static ConnectionPool cp;
 
+
     @BeforeAll
-    public static void beforeAll()
-    {
-        try {
-            cp = new ConnectionPool(JDBC_USER, JDBC_PASSWORD, JDBC_URL, JDBC_DB);
-            ClassLoader classLoader = TestDB.class.getClassLoader();
-            String initPath = classLoader.getResource("sql/init.sql").getPath();
-            String initSQL = Files.readString(Paths.get(initPath));
-            String dataPath = classLoader.getResource("sql/data.sql").getPath();
-            String dataSQL = Files.readString(Paths.get(dataPath));
-            Connection conn = cp.getConnection();
-            Statement stmt = conn.createStatement();
-            stmt.execute(initSQL);
-            stmt.execute(dataSQL);
-        } catch (Exception e) {
-            fail(e);
+    public static void setupDatabase() throws Exception {
+
+        cp = new ConnectionPool("postgres", "postgres", "jdbc:postgresql://localhost:5432/carport", "carport");
+
+        // Run test init + data to prepare `test` schema
+        try (Connection conn = cp.getConnection();
+             Statement stmt = conn.createStatement()) {
+
+            String initSql = Files.readString(Paths.get("src/test/resources/sql/init.sql"));
+            String dataSql = Files.readString(Paths.get("src/test/resources/sql/data.sql"));
+
+            stmt.execute(initSql);
+            stmt.execute(dataSql);
         }
     }
 
     @Test
     public void testOffer()
-            throws SQLException
-    {
+            throws SQLException, DBException {
         Offer offer = new Offer(0, 1, 0, "addr 9", 4242, "bobvile", 6000, 2000, 7800, 0, 0, 0.0, "Customer note", OfferStatus.SALESPERSON);
         assertTrue(OfferMapper.addOffer(cp, offer));
         List<Offer> offers = OfferMapper.getSalespersonOffers(cp, 0);
@@ -58,14 +53,74 @@ public class TestDB {
     }
 
     @Test
-    public void testGetWood(){
-        try {
-            Wood wood = WoodMapper.getWood(cp, WoodCategory.PILLAR, 2000);
-            assertNotNull(wood);
-            System.out.println(wood.id+", "+wood.category+", "+wood.length+", "+wood.pricePerMeter);
-        } catch (SQLException e) {
-            fail(e);
-        }
+    public void testGetWood() throws DBException {
+
+        Wood wood = WoodMapper.getWood(cp, WoodCategory.PILLAR, 2000);
+        assertNotNull(wood);
+        assertEquals(WoodCategory.PILLAR, wood.category);
+        assertTrue(wood.length >= 2000, "Wood lenght should be at least the wished length");
     }
+    @Test
+    void testLoginValidUserAndreturnsUser() throws DBException {
+        // arrange
+        String email = "ole@customer.dk";
+        // password is irrelevant because your hashing is not used in test;
+        // use whatever your login expects for the seeded user
+        String password = "password";
+
+        // act
+        User user = UserMapper.login(cp, email, password);
+
+        // assert
+        assertNotNull(user, "User should not be null for valid credentials");
+        assertEquals(email, user.email);
+    }
+
+    @Test
+    void testInsertAndGetBillsByOfferId() throws Exception {
+
+        Offer offer = new Offer(
+                0,
+                1,
+                1,
+                "Testvej 1",
+                4242,
+                "Bobville",
+                3000,
+                2200,
+                4800,
+                0,
+                0,
+                0.0,
+                "test",
+                OfferStatus.SALESPERSON
+        );
+        assertTrue(OfferMapper.addOffer(cp, offer), "Offer insert should succeed");
+
+        List<Offer> offers = OfferMapper.getCustomerOffers(cp, offer.customerId);
+        assertFalse(offers.isEmpty(), "Customer should have at least one offer");
+        Offer dbOffer = offers.get(offers.size() - 1);
+
+        Wood wood = WoodMapper.getWood(cp, WoodCategory.BEAM, 3000);
+        assertNotNull(wood, "Expected a BEAM wood of 3000mm in test data");
+
+        Bill bill = new Bill(
+                dbOffer.id,
+                wood.id,
+                2,
+                "helptext.todo",
+                123.45
+        );
+        assertTrue(BillMapper.insert(cp, bill), "Bill insert should succeed");
+        List<Bill> bills = BillMapper.getBillsByOfferId(cp, dbOffer.id);
+        assertEquals(1, bills.size(), "Exactly one bill expected for this offer");
+        Bill b = bills.get(0);
+        assertEquals(wood.id, b.woodId);
+        assertEquals(2, b.quantity);
+        assertEquals(3000, b.length);
+        assertEquals(WoodCategory.BEAM, b.category);
+        assertEquals("helptext.todo", b.helptext);
+    }
+
 
 }
