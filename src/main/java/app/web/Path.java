@@ -15,7 +15,6 @@ public class Path {
         public static final String SEND_REQUEST ="/SendRequest";
         public static final String USER_OFFERS = "/customer/offers";
         public static final String LOGOUT = "/logout";
-        public static final String ACCEPT_OFFER = "/offers/{id}/accept";
     }
 
     public static class Template {

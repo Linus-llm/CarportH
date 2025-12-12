@@ -13,8 +13,6 @@ public class CustomerController{
     {
         app.get(Path.Web.INDEX, CustomerController::serveIndexPage);
         app.post(Path.Web.SEND_REQUEST, CustomerController::handleFormPost);
-        app.post(Path.Web.ACCEPT_OFFER, CustomerController::handleAccept);
-        app.post("/offers/{id}/reject", CustomerController::handleReject);
         app.post("/offers/{id}/message", CustomerController::handleMessage);
         app.get(Path.Web.USER_OFFERS, CustomerController::serveOffersPage);
 
@@ -106,72 +104,36 @@ public class CustomerController{
             }
         }
 
-    public static void handleAccept(Context ctx) {
-        int id = Integer.parseInt(ctx.pathParam("id"));
-
-        try {
-            Offer offer = OfferMapper.getOffer(Server.connectionPool, id);
-            if (offer == null) {
-                ctx.status(404);
-                return;
-            }
-
-            offer.status = OfferStatus.ACCEPTED;
-
-            OfferMapper.updateOffer(Server.connectionPool, offer);
-
-            servePaymentPage(ctx);
-
-        } catch (Exception e) {
-            System.out.println("ERROR (handleAccept): " + e.getMessage());
-            ctx.status(500);
-        }
-    }
-
-    public static void servePaymentPage(Context ctx) {
-        ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
-        ctx.render(Path.Template.PAYMENT);
-        ctx.sessionAttribute("errmsg", null);
-    }
-
-    public static void handleReject(Context ctx) {
-        int id = Integer.parseInt(ctx.pathParam("id"));
-
-        try {
-            Offer offer = OfferMapper.getOffer(Server.connectionPool, id);
-            if (offer == null) {
-                ctx.status(404);
-                return;
-            }
-
-            offer.status = OfferStatus.SALESPERSON;
-
-            OfferMapper.updateOffer(Server.connectionPool, offer);
-
-            ctx.redirect(Path.Web.USER_OFFERS);
-
-        } catch (Exception e) {
-            System.out.println("ERROR (handleReject): " + e.getMessage());
-            ctx.status(500);
-        }
-    }
-
     public static void handleMessage(Context ctx) {
         int id = Integer.parseInt(ctx.pathParam("id"));
         String comment = ctx.formParam("comment");
+        String radio = ctx.formParam("decision");
 
         try {
+            if (comment == null || radio == null) {
+                ctx.status(HttpStatus.BAD_REQUEST);
+                return;
+            }
+
             Offer offer = OfferMapper.getOffer(Server.connectionPool, id);
             if (offer == null) {
                 ctx.status(404);
                 return;
             }
-
             offer.text = comment;
-
-            OfferMapper.updateOffer(Server.connectionPool, offer);
-
-            ctx.redirect(Path.Web.USER_OFFERS);
+            if (radio.equals("ACCEPTED")) {
+                offer.status = OfferStatus.ACCEPTED;
+                OfferMapper.updateOffer(Server.connectionPool, offer);
+                ctx.attribute("offer", offer);
+                ctx.render(Path.Template.PAYMENT);
+                return;
+            } else if (radio.equals("REJECTED")) {
+                offer.status = OfferStatus.SALESPERSON;
+                OfferMapper.updateOffer(Server.connectionPool, offer);
+                ctx.redirect(Path.Web.USER_OFFERS);
+                return;
+            }
+            ctx.status(HttpStatus.BAD_REQUEST);
 
         } catch (Exception e) {
             System.out.println("ERROR (handleMessage): " + e.getMessage());
