@@ -103,12 +103,22 @@ public class SalesController {
             ctx.attribute("defaultTab", defaultTab);
             ctx.sessionAttribute("defaultTab", "tab-dimensions");
 
-            // FIXME: use values from carport calculator
-            CarportSVG svg = new CarportSVG(600, 600, offer.width, offer.length);
-            svg.drawStraps(45, offer.length);
-            svg.drawRafters(45, 15, offer.length/14);
-            svg.drawPillars(97, 97, new int[]{1000, offer.length/2, offer.length-300});
-            ctx.attribute("svg", svg.toString());
+            // create a simple svg sketch
+            if (!bills.isEmpty()) {
+                // NOTE: we don't know the real wood dimensions, because of DB design.
+                CarportSVG svg = new CarportSVG(600, 600, offer.width, offer.length);
+                svg.drawBeams(50, offer.length);
+                svg.drawRafters(45, CarportCalculator.calcNumberOfRafters(offer.length));
+                svg.drawPillars(100, 100, CarportCalculator.calcPillarsOffs(offer.length, offer.shedLength));
+                int[] offsW = CarportCalculator.calcShedWidthPillarsOffs(
+                        offer.width,
+                        offer.shedWidth);
+                int[] offsL = CarportCalculator.calcShedLengthPillarsOffs(offer.width, offer.shedWidth, offer.shedLength);
+                svg.drawShedPillars(100, 100,
+                        offer.shedWidth, offer.shedLength, offsW, offsL);
+                svg.drawShedPlanks(offer.shedWidth, offer.shedLength);
+                ctx.attribute("svg", svg.toString());
+            }
 
             ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
             ctx.render(Path.Template.SALES_NEW_OFFER);
@@ -145,7 +155,22 @@ public class SalesController {
         offer.shedWidth = (int) (Float.parseFloat(sw) * 1000);
         offer.shedLength = (int) (Float.parseFloat(sl) * 1000);
 
-        CarportCalculator.calculateOffer(Server.connectionPool,offer, offer.width, offer.length, offer.height, offer.shedWidth, offer.shedLength);
+        try {
+            BillMapper.deleteOfferBills(Server.connectionPool, offer.id);
+            List<Bill> bills = CarportCalculator.calcBills(Server.connectionPool, offer);
+            if (bills == null)
+                ctx.sessionAttribute("errmsg", "* kunne ikke beregne stykliste");
+            else
+                if (!BillMapper.addBills(Server.connectionPool, bills))
+                    throw new SQLException("addBills returned false");
+
+            if (!OfferMapper.updateOffer(Server.connectionPool, offer))
+                throw new SQLException("updateOffer returned false");
+        } catch (SQLException e) {
+            System.out.println("ERROR: "+e.getStackTrace()[0]+": "+e.getMessage());
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            return;
+        }
 
         ctx.sessionAttribute("defaultTab", "tab-matlist");
         ctx.redirect(Path.Web.SALES_NEW_OFFER+offer.id);

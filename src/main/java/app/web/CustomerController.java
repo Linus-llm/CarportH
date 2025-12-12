@@ -29,7 +29,7 @@ public class CustomerController{
 
 
         // TODO: get possible dimensions from DB
-        List<Wood> beams = WoodMapper.getWoodsByCategory(Server.connectionPool, WoodCategory.BEAM);
+        List<Wood> beams = WoodMapper.getWoodsByCategory(Server.connectionPool, WoodCategory.RAFTER);
 
         int[] lengths = beams.stream().mapToInt(w -> w.length).distinct().sorted().toArray();
         int[] widths = beams.stream().mapToInt(w -> w.length).distinct().sorted().toArray();
