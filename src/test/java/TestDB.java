@@ -101,7 +101,7 @@ public class TestDB {
         assertFalse(offers.isEmpty(), "Customer should have at least one offer");
         Offer dbOffer = offers.get(offers.size() - 1);
 
-        Wood wood = WoodMapper.getWood(cp, WoodCategory.BEAM, 3000);
+        Wood wood = WoodMapper.getWood(cp, WoodCategory.RAFTER, 3000);
         assertNotNull(wood, "Expected a BEAM wood of 3000mm in test data");
 
         Bill bill = new Bill(
@@ -118,7 +118,7 @@ public class TestDB {
         assertEquals(wood.id, b.woodId);
         assertEquals(2, b.quantity);
         assertEquals(3000, b.length);
-        assertEquals(WoodCategory.BEAM, b.category);
+        assertEquals(WoodCategory.RAFTER, b.category);
         assertEquals("helptext.todo", b.helptext);
     }
 

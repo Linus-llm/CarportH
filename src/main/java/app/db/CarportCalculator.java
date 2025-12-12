@@ -71,17 +71,6 @@ public class CarportCalculator {
         if (offs[offs.length-1] > length-CarportRules.PILLARS_OFFS)
             offs[offs.length-1] = length-CarportRules.PILLARS_OFFS;
 
-        // TODO: move this to a test
-        if (offs[0] > CarportRules.MAX_PILLAR_SPACING_MM/2)
-            System.out.println("ERROR: length-offs[0] > MAX_PILLAR_SPACING_MM/2");
-        for (i = 1; i < offs.length; i++) {
-            if (offs[i]-offs[i-1] > CarportRules.MAX_PILLAR_SPACING_MM) {
-                System.out.println("ERROR: offs[" + i + "]-offs[" + (i - 1) + "] > MAX_PILLAR_SPACING_MM");
-            }
-        }
-        if (length-offs[offs.length-1] > CarportRules.MAX_PILLAR_SPACING_MM/2)
-            System.out.println("ERROR: length-offs[cnt-1] > MAX_PILLAR_SPACING_MM/2");
-
         return offs;
     }
 
