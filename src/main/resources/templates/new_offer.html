@@ -203,7 +203,7 @@
     </div>
     <div id="drawing" class="tabcontent">
         <p>Tegning</p>
-        <div th:utext="${svg}"></div>
+        <div th:if="${svg}!=null" th:utext="${svg}"></div>
     </div>
     <div id="offer" class="tabcontent">
         <div class="frame">

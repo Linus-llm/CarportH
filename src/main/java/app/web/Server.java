@@ -52,7 +52,7 @@ public class Server {
             ctx.status(500);
         });
 
-        // setup routes
+
         UserController.addRoutes(app);
         CustomerController.addRoutes(app);
         SalesController.addRoutes(app);

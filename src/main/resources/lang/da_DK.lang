@@ -2,7 +2,7 @@ RAFTER=Spærtræ
 PILLAR=Stolpe
 PLANK=Brædt
 
-helptext.todo=TODO: helptext
 helptext.pillars=Stolper nedgraves 90 cm. i jord
 helptext.rafters=Spær, monteres på rem
 helptext.beams=Remme i sider, sadles ned i stolper
+helptext.shedplanks=Til beklædning af skur

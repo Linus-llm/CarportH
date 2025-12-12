@@ -15,7 +15,7 @@
   </div>
   <div th:if="${user != null}" class="header-menu-item">
     <a href="/customer/offers">
-      <button class="header-menu-button-tilbud" type="button">Tilbud</button>
+      <button class="header-menu-button-offer" type="button">Tilbud</button>
     </a>
   </div>
   <div th:if="${user == null}" class="header-menu-item">
@@ -25,7 +25,7 @@
   </div>
   <div class="header-menu-item" th:if="${user != null and user.role.name() == 'SALESPERSON'}">
     <a href="/sales">
-      <button class="header-menu-button-SælgerView" type="button">SælgerView</button>
+      <button class="header-menu-button-SellerView" type="button">SælgerView</button>
     </a>
   </div>
   <div class="header-menu-item">
@@ -34,9 +34,9 @@
     </a>
   </div>
   <div th:if="${user != null}" class="header-menu-item">
-    <a href="/logout">
-      <button class="header-menu-button-logout" type="button">Log ud</button>
-    </a>
+    <form action="/logout" method="post" style="display:inline;">
+      <button class="header-menu-button-logout" type="submit">Log ud</button>
+    </form>
   </div>
 
 </div>
