@@ -96,14 +96,6 @@ public class CustomerController{
                 }
 
                 List<Offer> offers = OfferMapper.getCustomerOffers(Server.connectionPool, user.id);
-                System.out.println("User id: " + user.id + ", offers.size() = " + offers.size());
-
-                // henter styklisten til hver offer
-                for (Offer o : offers) {
-                    List<Bill> bills = BillMapper.getBillsByOfferId(Server.connectionPool, o.id);
-                    ctx.attribute("bills_" + o.id, bills);
-                }
-
 
                 ctx.attribute("user", user);
                 ctx.attribute("offers", offers);
@@ -188,18 +180,16 @@ public class CustomerController{
     }
     public static void serveOrderConfirmation(Context ctx) {
         int offerId = Integer.parseInt(ctx.queryParam("offerId"));
+        User user;
 
         try {
+            user = ctx.sessionAttribute("user");
             // 1. hent offer
             Offer offer = OfferMapper.getOffer(Server.connectionPool, offerId);
-            if (offer == null) {
+            if (offer == null || offer.status != OfferStatus.ORDERED || offer.customerId != user.id) {
                 ctx.status(404);
                 return;
             }
-
-            // 2. ændr status til PAID
-            offer.status = OfferStatus.ORDERED;
-            OfferMapper.updateOffer(Server.connectionPool, offer);
 
             // 3. hent styklisten
             List<Bill> bills = BillMapper.getBillsByOfferId(Server.connectionPool, offerId);
