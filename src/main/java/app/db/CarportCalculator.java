@@ -2,8 +2,7 @@ package app.db;
 
 import app.exceptions.CarportCalculationException;
 import app.exceptions.DBException;
-import java.util.ArrayList;
-import java.sql.SQLException;
+
 import java.util.ArrayList;
 
 import java.util.List;
@@ -71,17 +70,6 @@ public class CarportCalculator {
 
         if (offs[offs.length-1] > length-CarportRules.PILLARS_OFFS)
             offs[offs.length-1] = length-CarportRules.PILLARS_OFFS;
-
-        // TODO: move this to a test
-        if (offs[0] > CarportRules.MAX_PILLAR_SPACING_MM/2)
-            System.out.println("ERROR: length-offs[0] > MAX_PILLAR_SPACING_MM/2");
-        for (i = 1; i < offs.length; i++) {
-            if (offs[i]-offs[i-1] > CarportRules.MAX_PILLAR_SPACING_MM) {
-                System.out.println("ERROR: offs[" + i + "]-offs[" + (i - 1) + "] > MAX_PILLAR_SPACING_MM");
-            }
-        }
-        if (length-offs[offs.length-1] > CarportRules.MAX_PILLAR_SPACING_MM/2)
-            System.out.println("ERROR: length-offs[cnt-1] > MAX_PILLAR_SPACING_MM/2");
 
         return offs;
     }
@@ -177,7 +165,7 @@ public class CarportCalculator {
 
     // calculate bills/material list from an offer
     public static List<Bill> calcBills(ConnectionPool cp, Offer offer)
-            throws SQLException
+            throws DBException, CarportCalculationException
     {
         int cnt;
         Wood wood;
@@ -188,7 +176,7 @@ public class CarportCalculator {
         cnt = calcNumberOfRafters(offer.length);
         wood = WoodMapper.getWood(cp, WoodCategory.RAFTER, offer.width);
         if (wood == null)
-            return null;
+            throw new CarportCalculationException("rafters");
         price = (float)wood.pricePerMeter*(wood.length/1000.0);
         bills.add(new Bill(offer.id, wood.id, cnt, "helptext.rafters", cnt*price));
 
@@ -196,7 +184,7 @@ public class CarportCalculator {
         cnt = 2;
         wood = WoodMapper.getWood(cp, WoodCategory.RAFTER, offer.length);
         if (wood == null)
-            return null;
+            throw new CarportCalculationException("beams");
         price = (float)wood.pricePerMeter*(wood.length/1000.0);
         bills.add(new Bill(offer.id, wood.id, cnt, "helptext.beams", cnt*price));
 
@@ -208,14 +196,14 @@ public class CarportCalculator {
         cnt += calcShedLengthPillarCnt(innerWidth, offer.shedWidth, offer.shedLength);
         wood = WoodMapper.getWood(cp, WoodCategory.PILLAR, offer.height);
         if (wood == null)
-            return null;
+            throw new CarportCalculationException("pillars");
         price = (float)wood.pricePerMeter*(wood.length/1000.0);
         bills.add(new Bill(offer.id, wood.id, cnt, "helptext.pillars", cnt*price));
 
         // planks
         wood = WoodMapper.getWood(cp, WoodCategory.PLANK, 0);
         if (wood == null)
-            return null;
+            throw new CarportCalculationException("planks");
         cnt = calcNumberOfPlanksForShed(offer.shedLength, offer.shedWidth, wood.length);
         price = (float)wood.pricePerMeter*(wood.length/1000.0);
         bills.add(new Bill(offer.id, wood.id, cnt, "helptext.shedplanks", cnt*price));
@@ -239,7 +227,7 @@ public class CarportCalculator {
         //width
         Wood wood = null;
 
-        wood = WoodMapper.getWood(cp, WoodCategory.BEAM, widthMm);
+        wood = WoodMapper.getWood(cp, WoodCategory.RAFTER, widthMm);
 
         if (wood == null) {
             throw new CarportCalculationException("No wood found for BEAM width " + widthMm);
@@ -248,7 +236,7 @@ public class CarportCalculator {
         needs.add(new WoodNeed(WoodCategory.RAFTER, widthMm, beamCountWidth));
         //length
 
-        wood = WoodMapper.getWood(cp, WoodCategory.BEAM, lengthMm);
+        wood = WoodMapper.getWood(cp, WoodCategory.RAFTER, lengthMm);
 
         if (wood == null) {
             throw new CarportCalculationException("No wood found for BEAM length " + lengthMm);
@@ -271,7 +259,7 @@ public class CarportCalculator {
         // adding extra pillars for the shed and calculating planks needed
         if (shedWidthMm <= 3000) {
             needs.add(new WoodNeed(WoodCategory.PILLAR, heightMm, CarportRules.MIN_PILLARS_IF_SHED - CarportRules.MIN_PILLARS));
-            wood = WoodMapper.getWood(cp, WoodCategory.BEAM, heightMm);
+            wood = WoodMapper.getWood(cp, WoodCategory.RAFTER, heightMm);
             if (wood == null) {
                 throw new CarportCalculationException("No suitable BEAM found for shed planks");
             }
@@ -282,7 +270,7 @@ public class CarportCalculator {
             needs.add(new WoodNeed(WoodCategory.PILLAR, heightMm, CarportRules.MIN_PILLARS_IF_SHED+1 - CarportRules.MIN_PILLARS));
 
             //the wished length here refers to the height of the plank needed for the shed walls thus same height as pillar
-            wood = WoodMapper.getWood(cp, WoodCategory.BEAM, heightMm);
+            wood = WoodMapper.getWood(cp, WoodCategory.RAFTER, heightMm);
 
             if (wood == null) {
                 throw new CarportCalculationException("No suitable BEAM found for shed planks");

@@ -39,7 +39,7 @@ public class TestCalculator {
     @Test
     public void testCalcNumberOfPillars(){
 
-        assertEquals(9, c.calcNumberOfPillars(5000, 5999));
+        assertEquals(6, c.calcNumberOfPillars(5000, 0));
     }
     @Test
     public void testCalcNumberOfRafters(){
@@ -83,6 +83,22 @@ public class TestCalculator {
         for (WoodNeed n : needs) {
             System.out.println(n.type + " | length≥" + n.requiredLengthMm + " | count=" + n.count);
         }
+    }
+
+    @Test
+    public void testCalculatePillarOffs()
+    {
+        final int length = 6000; // 6 meters
+        int i;
+        int[] offs;
+
+        offs = CarportCalculator.calcPillarsOffs(length, 0);
+        assertNotNull(offs);
+        assertTrue(offs.length>=2, "offs.length>=2");
+        assertFalse(offs[0] > CarportRules.MAX_PILLAR_SPACING_MM/2, "offs[0] > MAX_PILLAR_SPACING_MM/2");
+        for (i = 1; i < offs.length; i++)
+            assertFalse(offs[i]-offs[i-1] > CarportRules.MAX_PILLAR_SPACING_MM, "offs["+i+"]-offs["+(i-1)+"] > MAX_PILLAR_SPACING_MM");
+        assertFalse(length-offs[offs.length-1] > CarportRules.MAX_PILLAR_SPACING_MM/2, "length-offs[offs.length-1] > MAX_PILLAR_SPACING_MM/2");
     }
 
 }
