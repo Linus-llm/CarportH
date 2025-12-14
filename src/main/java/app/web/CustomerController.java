@@ -16,7 +16,7 @@ public class CustomerController{
         app.post("/offers/{id}/message", CustomerController::handleMessage);
         app.get(Path.Web.USER_OFFERS, CustomerController::serveOffersPage);
 
-        app.get("/orderConfirmation", CustomerController::serveOrderConfirmation);
+        app.get("/orderConfirmation/{id}", CustomerController::serveOrderConfirmation);
     }
 
     public static void serveIndexPage(Context ctx) throws DBException {
@@ -141,13 +141,16 @@ public class CustomerController{
         }
     }
     public static void serveOrderConfirmation(Context ctx) {
-        int offerId = Integer.parseInt(ctx.queryParam("offerId"));
+        int offerId = Integer.parseInt(ctx.pathParam("id"));
         User user;
 
         try {
             user = ctx.sessionAttribute("user");
-            // 1. hent offer
+            // 1. find offer
             Offer offer = OfferMapper.getOffer(Server.connectionPool, offerId);
+            offer.status = OfferStatus.ORDERED;
+            // 2. update status to ORDERED
+            OfferMapper.updateOffer(Server.connectionPool, offer);
             if (offer == null || offer.status != OfferStatus.ORDERED || offer.customerId != user.id) {
                 ctx.status(404);
                 return;
