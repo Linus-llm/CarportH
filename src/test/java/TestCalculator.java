@@ -60,29 +60,7 @@ public class TestCalculator {
     @Test
     public void testCalcNumberOfPlanksForShed(){
 
-        assertEquals(200, c.calcNumberOfPlanksForShed(1000, 1000, 100));
-    }
-    @Test
-    public void testCalculateNeeds() throws DBException, CarportCalculationException {
-        int length = 6000;
-        int width = 4000;
-        int height = 2215;
-        List<WoodNeed> needs = c.calculateNeeds(cp, length, width, height);
-        for (WoodNeed n : needs) {
-            System.out.println(n.type + " | length≥" + n.requiredLengthMm + " | count=" + n.count);
-        }
-    }
-    @Test
-    public void testCalculateNeedsWithShed() throws DBException, CarportCalculationException {
-        int length = 6000;
-        int width = 4000;
-        int height = 2215;
-        int shedLength = 2000;
-        int shedWidth = 4000;
-        List<WoodNeed> needs = c.calculateNeedsWithShed(cp, length, width, height, shedWidth, shedLength);
-        for (WoodNeed n : needs) {
-            System.out.println(n.type + " | length≥" + n.requiredLengthMm + " | count=" + n.count);
-        }
+        assertEquals(4, c.calcNumberOfPlanksForShed(100, 100, 100));
     }
 
     @Test

@@ -5,6 +5,8 @@ import app.exceptions.DBException;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
+
+import java.text.ParseException;
 import java.util.List;
 
 public class CustomerController{
@@ -19,28 +21,34 @@ public class CustomerController{
         app.get("/orderConfirmation/{id}", CustomerController::serveOrderConfirmation);
     }
 
-    public static void serveIndexPage(Context ctx) throws DBException {
-        User user = ctx.sessionAttribute("user");
+    public static void serveIndexPage(Context ctx) {
+        try {
+            User user = ctx.sessionAttribute("user");
 
+            List<Wood> beams =
+                    WoodMapper.getWoodsByCategory(Server.connectionPool, WoodCategory.RAFTER);
 
-        // TODO: get possible dimensions from DB
-        List<Wood> beams = WoodMapper.getWoodsByCategory(Server.connectionPool, WoodCategory.RAFTER);
+            int[] lengths = beams.stream().mapToInt(w -> w.length).distinct().sorted().toArray();
+            int[] widths  = beams.stream().mapToInt(w -> w.length).distinct().sorted().toArray();
 
-        int[] lengths = beams.stream().mapToInt(w -> w.length).distinct().sorted().toArray();
-        int[] widths = beams.stream().mapToInt(w -> w.length).distinct().sorted().toArray();
-        ctx.attribute("widths", widths);
-        ctx.attribute("lengths", lengths);
-        int[] shedLengths = {1000, 1400, 1800, 2200, 2600, 3000, 3400, 3800, 4200, 4600, 5000};
-        ctx.attribute("shedLengths", shedLengths);
-        int[] shedWidths = widths;
-        ctx.attribute("shedWidths", shedWidths);
-        ctx.attribute("user", user);
-        ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
-        ctx.attribute("successTxt", ctx.sessionAttribute("successTxt"));
-        ctx.render(Path.Template.INDEX);
-        ctx.sessionAttribute("errmsg", null);
-        ctx.sessionAttribute("successTxt", null);
+            ctx.attribute("widths", widths);
+            ctx.attribute("lengths", lengths);
+            ctx.attribute("shedLengths", lengths);
+            ctx.attribute("shedWidths", widths);
+            ctx.attribute("user", user);
+            ctx.attribute("successTxt", ctx.sessionAttribute("successTxt"));
+            ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
+            ctx.sessionAttribute("errmsg", null);
+            ctx.sessionAttribute("successTxt", null);
+            ctx.render(Path.Template.INDEX);
+
+        } catch (DBException e) {
+
+            ctx.sessionAttribute("errmsg", "* Træ fra database kunne ikke hentes.");
+            ctx.render(Path.Template.INDEX);
+        }
     }
+
 
     public static void handleFormPost(Context ctx) {
         Offer offer;
@@ -72,10 +80,13 @@ public class CustomerController{
             double price = 0.0;
 
             offer = new Offer(0, customerId, salespersonId, address, postalcode, city, carportWidth, height, carportLength, carportShedWidth, carportShedLength, price, text, OfferStatus.SALESPERSON);
-            if (!OfferMapper.addQuery(Server.connectionPool, offer))
-                throw new Exception("addQuery failed");
+            OfferMapper.addQuery(Server.connectionPool, offer);
 
             ctx.sessionAttribute("successTxt", "* Din forespørgsel er sendt!");
+            ctx.redirect(Path.Web.INDEX);
+        } catch (DBException e) {
+            System.out.println("ERROR: " + e.getMessage());
+            ctx.sessionAttribute("errmsg", "* Din forespørgsel kunne ikke sendes!");
             ctx.redirect(Path.Web.INDEX);
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
@@ -98,9 +109,10 @@ public class CustomerController{
                 ctx.attribute("user", user);
                 ctx.attribute("offers", offers);
                 ctx.render(Path.Template.USER_OFFERS);
-            } catch (Exception e) {
+            } catch (DBException e) {
                 System.out.println("ERROR: " + e.getMessage());
-                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+                ctx.sessionAttribute("errmsg", "* Dine tilbud kunne ikke hentes.");
+                ctx.render(Path.Template.USER_OFFERS);
             }
         }
 
@@ -135,7 +147,7 @@ public class CustomerController{
             }
             ctx.status(HttpStatus.BAD_REQUEST);
 
-        } catch (Exception e) {
+        } catch (DBException e) {
             System.out.println("ERROR (handleMessage): " + e.getMessage());
             ctx.status(500);
         }

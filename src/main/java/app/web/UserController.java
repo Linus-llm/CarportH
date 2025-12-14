@@ -18,6 +18,7 @@ public class UserController {
         app.post(Path.Web.LOGOUT, UserController::handleLogoutPost);
 
     }
+
     public static void serveLoginPage(Context ctx)
     {
         ctx.attribute("errmsg", ctx.sessionAttribute("errmsg"));
@@ -25,33 +26,40 @@ public class UserController {
         ctx.sessionAttribute("errmsg", null);
     }
 
-    public static void handleLoginPost(Context ctx) throws DBException {
+    public static void handleLoginPost(Context ctx) {
         User user;
-        String redirect = ctx.sessionAttribute("loginredirect");
-        String email = ctx.formParam("email");
-        String password = ctx.formParam("password");
-        if (email == null || password == null) {
-            ctx.status(HttpStatus.BAD_REQUEST);
-            return;
+        try {
+            String redirect = ctx.sessionAttribute("loginredirect");
+            String email = ctx.formParam("email");
+            String password = ctx.formParam("password");
+            if (email == null || password == null) {
+                ctx.status(HttpStatus.BAD_REQUEST);
+                return;
+            }
+            if (email.isEmpty() || password.isEmpty()) {
+                ctx.sessionAttribute("errmsg", "* Ugyldig email eller password");
+                ctx.redirect(Path.Web.LOGIN);
+                return;
+            }
+            user = UserMapper.login(Server.connectionPool, email, password);
+            if (user == null) {
+                ctx.sessionAttribute("errmsg", "* Ugyldig email eller password");
+                ctx.redirect(Path.Web.LOGIN);
+                return;
+            }
+            ctx.sessionAttribute("user", user);
+            if (redirect != null) {
+                ctx.sessionAttribute("loginredirect", null);
+                ctx.redirect(redirect);
+                return;
+            }
+            ctx.redirect(Path.Web.INDEX);
         }
-        if (email.isEmpty() || password.isEmpty()) {
-            ctx.sessionAttribute("errmsg", "* Invalid email or password");
+        catch (DBException e) {
+            System.out.println("ERROR: " + e.getMessage());
+            ctx.sessionAttribute("errmsg", "Database fejl");
             ctx.redirect(Path.Web.LOGIN);
-            return;
         }
-        user = UserMapper.login(Server.connectionPool, email, password);
-        if (user == null) {
-            ctx.sessionAttribute("errmsg", "* Invalid email or password");
-            ctx.redirect(Path.Web.LOGIN);
-            return;
-        }
-        ctx.sessionAttribute("user", user);
-        if (redirect != null) {
-            ctx.sessionAttribute("loginredirect", null);
-            ctx.redirect(redirect);
-            return;
-        }
-        ctx.redirect(Path.Web.INDEX);
     }
 
     public static void handleLogoutPost(Context ctx)
@@ -60,20 +68,26 @@ public class UserController {
         ctx.redirect(Path.Web.INDEX);
     }
 
-    public static void handleRegisterPost(Context ctx) throws DBException {
+    public static void handleRegisterPost(Context ctx) {
         String name = ctx.formParam("name");
         String email = ctx.formParam("email");
         String password = ctx.formParam("password");
-        if (name == null || email == null || password == null) {
-            ctx.status(HttpStatus.BAD_REQUEST);
-            return;
-        }
-        if (name.isEmpty() || email.isEmpty() || password.isEmpty() ||
-                !UserMapper.register(Server.connectionPool, name, email, password)) {
-            ctx.sessionAttribute("errmsg", "* Failed to register");
+        try {
+            if (name == null || email == null || password == null) {
+                ctx.status(HttpStatus.BAD_REQUEST);
+                return;
+            }
+            if (name.isEmpty() || email.isEmpty() || password.isEmpty() ||
+                    !UserMapper.register(Server.connectionPool, name, email, password)) {
+                ctx.sessionAttribute("errmsg", "* Failed to register");
+                ctx.redirect(Path.Web.LOGIN);
+                return;
+            }
+            ctx.redirect(Path.Web.INDEX);
+        } catch (DBException e){
+            System.out.println("ERROR: " + e.getMessage());
+            ctx.sessionAttribute("errmsg", "Database fejl");
             ctx.redirect(Path.Web.LOGIN);
-            return;
         }
-        ctx.redirect(Path.Web.INDEX);
     }
 }

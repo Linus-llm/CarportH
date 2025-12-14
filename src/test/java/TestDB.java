@@ -20,7 +20,7 @@ public class TestDB {
     @BeforeAll
     public static void setupDatabase() throws Exception {
 
-        cp = new ConnectionPool("postgres", "postgres", "jdbc:postgresql://localhost:5432/carport", "carport");
+        cp = new ConnectionPool("postgres", "postgres", "jdbc:postgresql://localhost:5432/carport?currentSchema=test", "carport");
 
         // Run test init + data to prepare `test` schema
         try (Connection conn = cp.getConnection();
@@ -37,9 +37,9 @@ public class TestDB {
     @Test
     public void testOffer()
             throws SQLException, DBException {
-        Offer offer = new Offer(0, 1, 0, "addr 9", 4242, "bobvile", 6000, 2000, 7800, 0, 0, 0.0, "Customer note", OfferStatus.SALESPERSON);
+        Offer offer = new Offer(0, 1, 1, "addr 9", 4242, "bobvile", 6000, 2000, 7800, 0, 0, 0.0, "Customer note", OfferStatus.SALESPERSON);
         assertTrue(OfferMapper.addOffer(cp, offer));
-        List<Offer> offers = OfferMapper.getSalespersonOffers(cp, 0);
+        List<Offer> offers = OfferMapper.getSalespersonOffers(cp, 1);
         assertNotNull(offers);
         assertFalse(offers.isEmpty());
         offer = offers.get(0);
@@ -61,18 +61,14 @@ public class TestDB {
         assertTrue(wood.length >= 2000, "Wood lenght should be at least the wished length");
     }
     @Test
-    void testLoginValidUserAndreturnsUser() throws DBException {
-        // arrange
-        String email = "ole@customer.dk";
-        // password is irrelevant because your hashing is not used in test;
-        // use whatever your login expects for the seeded user
-        String password = "password";
+    void testLoginValidUserAndReturnsUser() throws DBException {
+        String email = "test@test.dk";
+        String password = "test";
 
-        // act
+        UserMapper.register(cp,"testname", email,password);
         User user = UserMapper.login(cp, email, password);
-
-        // assert
-        assertNotNull(user, "User should not be null for valid credentials");
+        
+        assertNotNull(user);
         assertEquals(email, user.email);
     }
 
