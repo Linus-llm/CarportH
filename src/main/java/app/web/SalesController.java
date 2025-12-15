@@ -59,7 +59,7 @@ public class SalesController {
             ctx.attribute("user", user);
 
             ctx.render(Path.Template.SALES);
-        } catch (Exception e) {
+        } catch (DBException e) {
             logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
         }

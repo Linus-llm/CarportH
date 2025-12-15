@@ -14,7 +14,10 @@
 <h2>Se dine tilbud</h2>
 
 <p class="intro-text">Her kan du se de tilbud, du har modtaget. <br>
-    Gennemgå oplysningerne og vælg, om du vil acceptere, oprette et modtilbud eller sende en kommentar.</p>
+    Gennemgå oplysningerne og vælg, om du vil acceptere, oprette et modtilbud eller sende en kommentar.
+    <div th:if="${errmsg != null}" class="alert-error" th:text="${errmsg}"></div>
+</p>
+
 
 <div class="tilbud-list">
 <section class="offer-box" th:each="offer : ${offers}">
