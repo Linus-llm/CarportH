@@ -20,7 +20,7 @@ public class TestDB {
     @BeforeAll
     public static void setupDatabase() throws Exception {
 
-        cp = new ConnectionPool("postgres", "postgres", "jdbc:postgresql://localhost:5432/carport?currentSchema=test", "carport");
+        cp = new ConnectionPool("postgres", "PropErMegaNice!", "jdbc:postgresql://db:5432/carport?currentSchema=test", "carport");
 
         // Run test init + data to prepare `test` schema
         try (Connection conn = cp.getConnection();
