@@ -203,7 +203,7 @@ public class CarportCalculator {
         int innerWidth = offer.width-CarportRules.BEAMS_OFFS*2;
         cnt += calcShedWidthPillarCnt(innerWidth, offer.shedWidth);
         cnt += calcShedLengthPillarCnt(innerWidth, offer.shedWidth, offer.shedLength);
-        wood = WoodMapper.getWood(cp, WoodCategory.PILLAR, offer.height);
+        wood = WoodMapper.getWood(cp, WoodCategory.PILLAR, offer.height+CarportRules.PILLAR_EXTRA_MM);
         if (wood == null)
             throw new CarportCalculationException("pillars");
         price = (float)wood.pricePerMeter*(wood.length/1000.0);

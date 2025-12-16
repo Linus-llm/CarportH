@@ -13,7 +13,9 @@ public class Path {
         public static final String SALES_CLAIM_OFFER = "/sales/claim-offer/{id}";
         public static final String REGISTER ="/register";
         public static final String SEND_REQUEST ="/SendRequest";
+        public static final String HANDLE_MESSAGE ="/offers/{id}/message";
         public static final String USER_OFFERS = "/customer/offers";
+        public static final String ORDER_CONFIRM = "/orderConfirmation/{id}";
         public static final String LOGOUT = "/logout";
     }
 
@@ -24,5 +26,6 @@ public class Path {
         public static final String SALES_NEW_OFFER = "/new_offer.html";
         public static final String USER_OFFERS = "customerPage.html";
         public static final String PAYMENT = "/payment.html";
+        public static final String ORDER_RECEIPT = "orderReceipt.html";
     }
 }

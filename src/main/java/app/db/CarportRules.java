@@ -6,6 +6,7 @@ public class CarportRules {
     public static final int PILLARS_OFFS = 300; // offset from ends
     public static final int BEAMS_OFFS = 350; // offset from sides
     public static final int MAX_PILLAR_SPACING_MM = 3000;
+    public static final int PILLAR_EXTRA_MM = 1000; // dug into earth
     public static final int MIN_PILLARS = 4;
     public static final int MIN_BOARDS= 2;
     public static final int MIN_PILLARS_IF_SHED = 7;

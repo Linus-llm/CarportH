@@ -3,12 +3,17 @@ package app.web;
 import app.db.UserMapper;
 import app.db.User;
 import app.exceptions.DBException;
+
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class UserController {
+
+    private static Logger logger = Logger.getLogger("web");
 
     public static void addRoutes(Javalin app)
     {
@@ -56,7 +61,7 @@ public class UserController {
             ctx.redirect(Path.Web.INDEX);
         }
         catch (DBException e) {
-            System.out.println("ERROR: " + e.getMessage());
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
             ctx.sessionAttribute("errmsg", "Database fejl");
             ctx.redirect(Path.Web.LOGIN);
         }
@@ -85,7 +90,7 @@ public class UserController {
             }
             ctx.redirect(Path.Web.INDEX);
         } catch (DBException e){
-            System.out.println("ERROR: " + e.getMessage());
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
             ctx.sessionAttribute("errmsg", "Database fejl");
             ctx.redirect(Path.Web.LOGIN);
         }

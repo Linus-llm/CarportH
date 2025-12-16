@@ -6,19 +6,22 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 
-import java.text.ParseException;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class CustomerController{
+
+    private static Logger logger = Logger.getLogger("web");
 
     public static void addRoutes(Javalin app)
     {
         app.get(Path.Web.INDEX, CustomerController::serveIndexPage);
         app.post(Path.Web.SEND_REQUEST, CustomerController::handleFormPost);
-        app.post("/offers/{id}/message", CustomerController::handleMessage);
+        app.post(Path.Web.HANDLE_MESSAGE, CustomerController::handleMessage);
         app.get(Path.Web.USER_OFFERS, CustomerController::serveOffersPage);
 
-        app.get("/orderConfirmation/{id}", CustomerController::serveOrderConfirmation);
+        app.get(Path.Web.ORDER_CONFIRM, CustomerController::serveOrderConfirmation);
     }
 
     public static void serveIndexPage(Context ctx) {
@@ -43,12 +46,10 @@ public class CustomerController{
             ctx.render(Path.Template.INDEX);
 
         } catch (DBException e) {
-
             ctx.sessionAttribute("errmsg", "* Træ fra database kunne ikke hentes.");
             ctx.render(Path.Template.INDEX);
         }
     }
-
 
     public static void handleFormPost(Context ctx) {
         Offer offer;
@@ -85,41 +86,48 @@ public class CustomerController{
             ctx.sessionAttribute("successTxt", "* Din forespørgsel er sendt!");
             ctx.redirect(Path.Web.INDEX);
         } catch (DBException e) {
-            System.out.println("ERROR: " + e.getMessage());
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
             ctx.sessionAttribute("errmsg", "* Din forespørgsel kunne ikke sendes!");
             ctx.redirect(Path.Web.INDEX);
         } catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
+            logger.log(Level.WARNING, e.getStackTrace()[0]+": "+e.getMessage());
             ctx.sessionAttribute("errmsg", "* Din forespørgsel kunne ikke sendes!");
             ctx.redirect(Path.Web.INDEX);
         }
     }
-        public static void serveOffersPage(Context ctx)
-        {
-            try {
-                User user = ctx.sessionAttribute("user");
-                if (user == null) {
-                    ctx.sessionAttribute("loginredirect", Path.Web.USER_OFFERS);
-                    ctx.redirect(Path.Web.LOGIN);
-                    return;
-                }
 
-                List<Offer> offers = OfferMapper.getCustomerOffers(Server.connectionPool, user.id);
-
-                ctx.attribute("user", user);
-                ctx.attribute("offers", offers);
-                ctx.render(Path.Template.USER_OFFERS);
-            } catch (DBException e) {
-                System.out.println("ERROR: " + e.getMessage());
-                ctx.sessionAttribute("errmsg", "* Dine tilbud kunne ikke hentes.");
-                ctx.render(Path.Template.USER_OFFERS);
+    public static void serveOffersPage(Context ctx)
+    {
+        try {
+            User user = ctx.sessionAttribute("user");
+            if (user == null) {
+                ctx.sessionAttribute("loginredirect", Path.Web.USER_OFFERS);
+                ctx.redirect(Path.Web.LOGIN);
+                return;
             }
+
+            List<Offer> offers = OfferMapper.getCustomerOffers(Server.connectionPool, user.id);
+
+            ctx.attribute("user", user);
+            ctx.attribute("offers", offers);
+            ctx.render(Path.Template.USER_OFFERS);
+        } catch (DBException e) {
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
+            ctx.sessionAttribute("errmsg", "* Dine tilbud kunne ikke hentes.");
+            ctx.render(Path.Template.USER_OFFERS);
         }
+    }
 
     public static void handleMessage(Context ctx) {
         int id = Integer.parseInt(ctx.pathParam("id"));
         String comment = ctx.formParam("comment");
         String radio = ctx.formParam("decision");
+        User user = ctx.sessionAttribute("user");
+
+        if (user == null) {
+            ctx.status(HttpStatus.FORBIDDEN);
+            return;
+        }
 
         try {
             if (comment == null || radio == null) {
@@ -128,7 +136,7 @@ public class CustomerController{
             }
 
             Offer offer = OfferMapper.getOffer(Server.connectionPool, id);
-            if (offer == null) {
+            if (offer == null || offer.customerId != user.id) {
                 ctx.status(404);
                 return;
             }
@@ -148,25 +156,31 @@ public class CustomerController{
             ctx.status(HttpStatus.BAD_REQUEST);
 
         } catch (DBException e) {
-            System.out.println("ERROR (handleMessage): " + e.getMessage());
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(500);
         }
     }
+
     public static void serveOrderConfirmation(Context ctx) {
         int offerId = Integer.parseInt(ctx.pathParam("id"));
         User user;
 
         try {
             user = ctx.sessionAttribute("user");
+            if (user == null) {
+                ctx.redirect(Path.Web.LOGIN);
+                return;
+            }
             // 1. find offer
             Offer offer = OfferMapper.getOffer(Server.connectionPool, offerId);
-            offer.status = OfferStatus.ORDERED;
-            // 2. update status to ORDERED
-            OfferMapper.updateOffer(Server.connectionPool, offer);
-            if (offer == null || offer.status != OfferStatus.ORDERED || offer.customerId != user.id) {
+            if (offer == null || offer.status != OfferStatus.ACCEPTED || offer.customerId != user.id) {
                 ctx.status(404);
                 return;
             }
+
+            // 2. update status to ORDERED
+            offer.status = OfferStatus.ORDERED;
+            OfferMapper.updateOffer(Server.connectionPool, offer);
 
             // 3. hent styklisten
             List<Bill> bills = BillMapper.getBillsByOfferId(Server.connectionPool, offerId);
@@ -175,10 +189,10 @@ public class CustomerController{
             ctx.attribute("offer", offer);
             ctx.attribute("bills", bills);
 
-            ctx.render("orderReceipt.html");
+            ctx.render(Path.Template.ORDER_RECEIPT);
 
-        } catch (Exception e) {
-            System.out.println("ERROR (serveOrderConfirmation): " + e.getMessage());
+        } catch (DBException e) {
+            logger.log(Level.SEVERE, e.getStackTrace()[0]+": "+e.getMessage());
             ctx.status(500);
         }
     }
