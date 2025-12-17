@@ -1,9 +1,6 @@
 package app.web;
-
 import io.javalin.Javalin;
-
 import java.sql.SQLException;
-
 import io.javalin.rendering.template.JavalinThymeleaf;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
@@ -12,10 +9,10 @@ import app.db.ConnectionPool;
 
 public class Server {
 
-    private static final String JDBC_USER = System.getenv("JDBC_USER");
-    private static final String JDBC_PASSWORD = System.getenv("JDBC_PASSWORD");
-    private static final String JDBC_URL = System.getenv("JDBC_URL");
-    private static final String JDBC_DB = System.getenv("JDBC_DB");
+    private static final String JDBC_USER = "postgres";
+    private static final String JDBC_PASSWORD = "PropErMegaNice!";
+    private static final String JDBC_URL = "jdbc:postgresql://db:5432/%s?currentSchema=public";
+    private static final String JDBC_DB = "carport";
     static ConnectionPool connectionPool;
 
     public static void main(String[] args)
