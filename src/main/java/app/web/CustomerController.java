@@ -33,10 +33,11 @@ public class CustomerController{
 
             int[] lengths = beams.stream().mapToInt(w -> w.length).distinct().sorted().toArray();
             int[] widths  = beams.stream().mapToInt(w -> w.length).distinct().sorted().toArray();
+            int[] shedLengths = new int[]{1000, 2000, 3000, 4000};
 
             ctx.attribute("widths", widths);
             ctx.attribute("lengths", lengths);
-            ctx.attribute("shedLengths", lengths);
+            ctx.attribute("shedLengths", shedLengths);
             ctx.attribute("shedWidths", widths);
             ctx.attribute("user", user);
             ctx.attribute("successTxt", ctx.sessionAttribute("successTxt"));
